@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" maxHeight="480.0" maxWidth="600.0" minHeight="480.0" minWidth="600.0" prefHeight="480.0" prefWidth="600.0" spacing="20.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.proyecto_1_progra_ii.Controller">
+   <children>
+      <ButtonBar prefHeight="40.0" prefWidth="200.0" />
+      <MenuBar VBox.vgrow="ALWAYS">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+         <VBox.margin>
+            <Insets left="-20.0" right="-20.0" top="-195.0" />
+         </VBox.margin>
+      </MenuBar>
+      <Label text="Ingrese el nombre del jugador:">
+         <VBox.margin>
+            <Insets top="100.0" />
+         </VBox.margin>
+      </Label>
+      <TextField fx:id="playerNameField" prefHeight="23.0" prefWidth="119.0">
+         <VBox.margin>
+            <Insets left="150.0" right="150.0" />
+         </VBox.margin>
+      </TextField>
+      <Button fx:id="playButton" mnemonicParsing="false" onAction="#handlePlayButton" style="-fx-cursor: hand;" text="Jugar" />
+      <Label layoutX="228.0" layoutY="292.0" text="Elija una dificultad:" />
+      <ButtonBar buttonMinWidth="60.0" layoutX="200.0" layoutY="368.0" prefHeight="40.0" prefWidth="200.0">
+         <buttons>
+            <RadioButton fx:id="easyDifficulty" mnemonicParsing="false" onAction="#handleDifficultyButtons" style="-fx-cursor: hand;" text="Facil" />
+            <RadioButton fx:id="mediumDifficulty" mnemonicParsing="false" onAction="#handleDifficultyButtons" style="-fx-cursor: hand;" text="Medio" />
+            <RadioButton fx:id="hardDifficulty" layoutX="440.0" layoutY="21.0" mnemonicParsing="false" onAction="#handleDifficultyButtons" style="-fx-cursor: hand;" text="Dificil" />
+         </buttons>
+         <VBox.margin>
+            <Insets left="180.0" right="180.0" />
+         </VBox.margin>
+      </ButtonBar>
+   </children>
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </padding>
+</VBox>
