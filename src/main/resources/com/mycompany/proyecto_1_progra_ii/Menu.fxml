@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane fx:id="gameAnchorPane" prefHeight="500.0" prefWidth="550.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.proyecto_1_progra_ii.MenuController">
+   <children>
+      <TextField fx:id="playerNameField" layoutX="150.0" layoutY="200.0" prefHeight="23.0" prefWidth="248.0" />
+      <Label fx:id="nameInstruction" layoutX="195.0" layoutY="157.0" text="Ingrese el nombre del jugador:" />
+      <MenuBar layoutY="-3.0" prefHeight="30.0" prefWidth="554.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <ButtonBar fx:id="difficultyButtonBar" buttonMinWidth="60.0" layoutX="163.0" layoutY="283.0" prefHeight="40.0" prefWidth="210.0">
+         <buttons>
+            <RadioButton fx:id="easyDifficulty" mnemonicParsing="false" onAction="#handleDifficultyButtons" style="-fx-cursor: hand;" text="Facil" />
+            <RadioButton fx:id="mediumDifficulty" mnemonicParsing="false" onAction="#handleDifficultyButtons" style="-fx-cursor: hand;" text="Medio" />
+            <RadioButton fx:id="hardDifficulty" mnemonicParsing="false" onAction="#handleDifficultyButtons" style="-fx-cursor: hand;" text="Dificil" />
+         </buttons>
+      </ButtonBar>
+      <Button fx:id="playButton" layoutX="247.0" layoutY="348.0" mnemonicParsing="false" onAction="#handlePlayButton" prefWidth="54.0" style="-fx-cursor: hand;" text="Jugar" />
+      <Label fx:id="difficultyInstruction" layoutX="227.0" layoutY="250.0" text="Elija una dificultad:" />
+      <ButtonBar layoutX="-114.0" layoutY="360.0" prefHeight="40.0" prefWidth="200.0" />
+   </children>
+</AnchorPane>
