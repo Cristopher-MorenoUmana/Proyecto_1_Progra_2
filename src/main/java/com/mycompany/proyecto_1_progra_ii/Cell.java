@@ -16,6 +16,7 @@ public class Cell {
         this.cellBox.setStroke(Color.BLACK);
         this.cellBox.setStrokeWidth(1);
         
+        this.cellBox.setOnMouseClicked(envet ->cellBox.setFill(Color.web("336666")));
         this.cellState = 0;
     }
     
@@ -29,13 +30,18 @@ public class Cell {
         return this.cellState;
     }
     
-    public boolean isCellClicked(){
+    public Rectangle getCellBox(){
         
-        return this.cellBox.isPressed();
+        return this.cellBox;
     }
     
     public void drawCell(AnchorPane pCellAnchorPane){
         
         pCellAnchorPane.getChildren().add(this.cellBox);
     }
+    
+    public void changeCellColor(String pColor){
+        
+        this.cellBox.setFill(Color.web(pColor));
+    }   
 }

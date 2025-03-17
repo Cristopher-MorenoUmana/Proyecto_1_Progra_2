@@ -37,8 +37,12 @@ public class MenuController {
 
     private int difficultyNumber = 0;
 
+    private Player player1;
+    
     private Game game;
 
+    private Board player1Board;
+    
     @FXML
     private void handleDifficultyButtons(ActionEvent event) {
         if (easyDifficulty.isSelected()) {
@@ -85,13 +89,17 @@ public class MenuController {
 
         if (isValidData) {
 
-            this.game = new Game(this.difficultyNumber, this.playerNameField.getText());
+            this.game = new Game(this.difficultyNumber);
+            
+            player1Board = new Board(game);
+            
+            this.player1 = new Player(this.playerNameField.getText(), this.player1Board);
             
             disableMenuComponents();
             
             Main.resizeWindow(285, 425);
             
-            game.drawBoard(gameAnchorPane);
+            player1Board.drawBoard(gameAnchorPane);
             
         } else {
             System.out.println("No se ha ingresado algun dato.");
