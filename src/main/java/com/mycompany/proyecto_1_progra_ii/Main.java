@@ -12,9 +12,15 @@ public class Main extends Application {
     
     private static Scene scene;
 
+    
+
     @Override
     public void start(Stage stage) throws IOException {
+        
         scene = new Scene(loadFXML("Menu"), 554, 500);
+        
+        scene.getStylesheets().add(getClass().getResource("/com.css/style.css").toExternalForm());
+        
         stage.setScene(scene);
         stage.setTitle("Batalla naval");
         stage.show();

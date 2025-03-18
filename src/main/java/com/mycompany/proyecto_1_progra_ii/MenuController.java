@@ -37,14 +37,19 @@ public class MenuController {
 
     private int difficultyNumber = 0;
 
-    private Player player1;
+    private Player player1, player2;
     
     private Game game;
 
     private Board player1Board;
     
+    private Board player2Board;
+    
+    private Label playerBoardLabel, pcBoardLabel;
+    
     @FXML
     private void handleDifficultyButtons(ActionEvent event) {
+       
         if (easyDifficulty.isSelected()) {
 
             this.isDifficultySelected = true;
@@ -91,15 +96,32 @@ public class MenuController {
 
             this.game = new Game(this.difficultyNumber);
             
-            player1Board = new Board(game);
+            player1Board = new Board(game, 15,60,1);
+            
+            player2Board = new Board(game,270,60,2);
             
             this.player1 = new Player(this.playerNameField.getText(), this.player1Board);
             
+            this.player2= new Player("PC", this.player2Board);
+            
             disableMenuComponents();
             
-            Main.resizeWindow(285, 425);
+            Main.resizeWindow(540, 440);
+            
+            this.playerBoardLabel = new Label("Tablero de: " + this.player1.getPlayerName());
+            this.pcBoardLabel = new Label("Tablero de: " + this.player2.getPlayerName());
+            
+            this.playerBoardLabel.setLayoutX(102);
+            this.playerBoardLabel.setLayoutY(30);
+            
+            this.pcBoardLabel.setLayoutX(358);
+            this.pcBoardLabel.setLayoutY(30);
+            
+            this.gameAnchorPane.getChildren().add(playerBoardLabel);
+            this.gameAnchorPane.getChildren().add(pcBoardLabel);
             
             player1Board.drawBoard(gameAnchorPane);
+            player2Board.drawBoard(gameAnchorPane);
             
         } else {
             System.out.println("No se ha ingresado algun dato.");

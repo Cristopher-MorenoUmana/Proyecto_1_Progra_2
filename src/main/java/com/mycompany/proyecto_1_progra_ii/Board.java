@@ -5,12 +5,18 @@ import javafx.scene.layout.AnchorPane;
 public class Board extends Game {
 
     private Cell[][] cells;
-    private int matrixSizeRow, matrixSizeColumn;
-
-    public Board(Game pGame) {
+    private int matrixSizeRow, matrixSizeColumn, firstCellPositionX, 
+            firstCellPositionY, boardType;
+    
+    public Board(Game pGame, int pFirstCellPositionX, int pFirstCellPositionY, 
+            int pBoardType) {
 
         super(pGame.difficulty);
-
+        
+        this.firstCellPositionX = pFirstCellPositionX;
+        this.firstCellPositionY = pFirstCellPositionY;
+        this.boardType = pBoardType;    
+        
         fillBoard();
     }
 
@@ -22,28 +28,38 @@ public class Board extends Game {
             this.matrixSizeColumn = 9;
 
             this.cells = new Cell[matrixSizeRow][matrixSizeColumn];
+            
+            fillMatrix();
+        }else{ //FIX:THIS BLOCK IS TEMPORARY
+            System.out.println("Proximamente");
+            
+            this.matrixSizeRow = 12;
+            this.matrixSizeColumn = 9;
 
+            this.cells = new Cell[matrixSizeRow][matrixSizeColumn];
+            
             fillMatrix();
         }
     }
-
+    
     private void fillMatrix() {
 
         final int CELLS_SPACING = 30;
-        int cellsPositionX, cellsPositionY = 40;
-
+        
+        int auxPositionX = this.firstCellPositionX;
+        
         for (int i = 0; i < this.matrixSizeRow - 1; i++) {
-
-            cellsPositionX = 15;
-
+            
+            this.firstCellPositionX = auxPositionX;
+            
             for (int j = 0; j < this.matrixSizeColumn - 1; j++) {
 
-                this.cells[i][j] = new Cell(cellsPositionX, cellsPositionY);
-                this.cells[i][j].setCellState(0);
+                this.cells[i][j] = new Cell(this.firstCellPositionX,
+                        this.firstCellPositionY, this.boardType);
 
-                cellsPositionX += CELLS_SPACING;
+                this.firstCellPositionX += CELLS_SPACING;
             }
-            cellsPositionY += CELLS_SPACING;
+            this.firstCellPositionY += CELLS_SPACING;
         }
     }
 
@@ -66,5 +82,15 @@ public class Board extends Game {
     public double getMatrixSizeColumn() {
 
         return this.matrixSizeColumn;
+    }
+    
+    public void setFirstCellPostionX(int pFirstCellpositionX){
+        
+        this.firstCellPositionX = pFirstCellpositionX;
+    }
+    
+     public void setFirstCellPostionY(int pFirstCellpositionY){
+        
+        this.firstCellPositionY = pFirstCellpositionY;
     }
 }
