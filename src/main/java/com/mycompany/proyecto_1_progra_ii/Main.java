@@ -11,12 +11,12 @@ import java.io.IOException;
 public class Main extends Application {
     
     private static Scene scene;
-
+    private static Stage stage;
     
-
     @Override
     public void start(Stage stage) throws IOException {
         
+        Main.stage = stage;
         scene = new Scene(loadFXML("Menu"), 554, 500);
         
         scene.getStylesheets().add(getClass().getResource("/com.css/style.css").toExternalForm());
@@ -28,9 +28,10 @@ public class Main extends Application {
 
     static void resizeWindow(double pWidth, double pHeight) throws IOException {
 
-        Stage stage = (Stage) scene.getWindow();
-        stage.setWidth(pWidth);
-        stage.setHeight(pHeight);
+       if (stage != null) {
+            stage.setWidth(pWidth);
+            stage.setHeight(pHeight);
+        }
     }
     
     private static Parent loadFXML(String fxml) throws IOException {
@@ -40,6 +41,10 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch();
+    }
+    
+       public static Scene getScene() {
+        return scene;
     }
 
 }

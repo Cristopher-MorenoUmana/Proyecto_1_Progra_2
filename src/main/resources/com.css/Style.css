@@ -1,12 +1,22 @@
 Button {
-    -fx-background-color: white;
+    -fx-background-color: #00CCCC;
     -fx-text-fill: black;        
-    -fx-border-color: grey;    
+    -fx-border-color: black;    
     -fx-background-radius: 5;   
-    -fx-border-radius: 5; 
+    -fx-border-radius: 3; 
+    -fx-cursor: hand;
+    -fx-border-width: 0;    
+}
+ 
+AnchorPane{
+    -fx-background-color: #333333;
 }
 
-Button:hover {
-    -fx-background-color: #6600FF;
-    -fx-border-color: black;
+Label{
+    -fx-text-fill: white;   
 }
+
+RadioButton{
+    -fx-text-fill: white; 
+}
+

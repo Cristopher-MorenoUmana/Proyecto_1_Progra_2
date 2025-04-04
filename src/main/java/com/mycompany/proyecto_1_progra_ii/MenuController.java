@@ -9,9 +9,17 @@ import javafx.scene.control.Label;
 import javafx.event.ActionEvent;
 import java.io.IOException;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Text;
+import javafx.scene.paint.Color;
+
 
 public class MenuController {
 
+    @FXML 
+    private Label dataErrorLabel;
+    @FXML
+    private Text titleText;
+    
     @FXML
     private TextField playerNameField;
 
@@ -45,11 +53,12 @@ public class MenuController {
     
     private Board player2Board;
     
-    private Label playerBoardLabel, pcBoardLabel;
+    //private Label playerBoardLabel, pcBoardLabel;
+    private Text playerBoardText, pcBoardText;
     
     @FXML
     private void handleDifficultyButtons(ActionEvent event) {
-       
+
         if (easyDifficulty.isSelected()) {
 
             this.isDifficultySelected = true;
@@ -91,40 +100,60 @@ public class MenuController {
 
         boolean isValidData = (isDifficultySelected)
                 && (playerNameField.getText().isEmpty() == false);
+       
 
         if (isValidData) {
 
+            this.dataErrorLabel.setVisible(false);
+
             this.game = new Game(this.difficultyNumber);
-            
-            player1Board = new Board(game, 15,60,1);
-            
-            player2Board = new Board(game,270,60,2);
-            
+
+            player1Board = new Board(game, 15, 60, 1);
+
+            player2Board = new Board(game, 350, 60, 2);
+
             this.player1 = new Player(this.playerNameField.getText(), this.player1Board);
-            
-            this.player2= new Player("PC", this.player2Board);
-            
+
+            this.player2 = new Player("PC", this.player2Board);
+
             disableMenuComponents();
+
+            double windowWidth = 650, windowHeight = 600;
             
-            Main.resizeWindow(540, 440);
+            Main.resizeWindow(windowWidth, windowHeight);
+            this.gameAnchorPane.setPrefWidth(windowWidth);
+            this.gameAnchorPane.setPrefHeight(windowHeight);
             
-            this.playerBoardLabel = new Label("Tablero de: " + this.player1.getPlayerName());
-            this.pcBoardLabel = new Label("Tablero de: " + this.player2.getPlayerName());
+            this.playerBoardText = new Text("Tablero de: " + this.player1.getPlayerName());
+
+            this.pcBoardText = new Text("Tablero de: " + this.player2.getPlayerName());
+
+            this.playerBoardText.setFill(Color.WHITE);
+            this.pcBoardText.setFill(Color.WHITE);
             
-            this.playerBoardLabel.setLayoutX(102);
-            this.playerBoardLabel.setLayoutY(30);
+            this.gameAnchorPane.getChildren().add(playerBoardText);
+            this.gameAnchorPane.getChildren().add(pcBoardText);
+
+            player1Board.drawBoardComponents(gameAnchorPane);
+            player2Board.drawBoardComponents(gameAnchorPane);
+
+            double board1Center = ((this.player1Board.firstCellPositionX * 2 +
+                    (this.player1Board.boardWidth - this.playerBoardText.getBoundsInLocal().getWidth()))/2);
             
-            this.pcBoardLabel.setLayoutX(358);
-            this.pcBoardLabel.setLayoutY(30);
+            double board2Center = ((this.player2Board.firstCellPositionX * 2 +
+                    (this.player2Board.boardWidth - this.pcBoardText.getBoundsInLocal().getWidth()))/2);
             
-            this.gameAnchorPane.getChildren().add(playerBoardLabel);
-            this.gameAnchorPane.getChildren().add(pcBoardLabel);
+            this.playerBoardText.setLayoutX(board1Center);
+            this.pcBoardText.setLayoutX(board2Center);
             
-            player1Board.drawBoard(gameAnchorPane);
-            player2Board.drawBoard(gameAnchorPane);
-            
+ 
+            this.playerBoardText.setLayoutY(this.player1Board.getFirstCellPostionY() - 10);
+            this.pcBoardText.setLayoutY(this.player2Board.getFirstCellPostionY() - 10);
+
+                       
+
         } else {
-            System.out.println("No se ha ingresado algun dato.");
+            this.dataErrorLabel.setVisible(true);
         }
     }
     
@@ -144,5 +173,8 @@ public class MenuController {
         
         this.difficultyInstruction.setVisible(false);
         this.difficultyInstruction.setDisable(true);
+        
+        this.titleText.setVisible(false);
+        this.titleText.setDisable(true);
     }
 }
