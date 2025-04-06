@@ -13,7 +13,7 @@ public class Cell {
     public Cell(double pCellsPostionX, double pCellsPositionY, int pCellType){
         
         this.cellBox = new Rectangle(pCellsPostionX, pCellsPositionY, 30, 30);
-        this.cellColor = "009999";
+        this.cellColor = "#009999";
         this.cellBox.setFill(Color.web(this.cellColor));
         this.cellBox.setStroke(Color.BLACK);
         this.cellBox.setStrokeWidth(1);
@@ -48,6 +48,7 @@ public class Cell {
     public void setCellColor(String pColor){
         
         this.cellBox.setFill(Color.web(pColor));
+        this.cellColor = pColor;
     } 
     
     public void setCellStrokeColor(String pColor) {

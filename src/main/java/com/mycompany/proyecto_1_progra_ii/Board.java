@@ -260,10 +260,10 @@ public class Board extends Game {
     private void manageShipsQuantity(int row, int column) {
 
         this.shipsToPlace--;
-
+        
         buildSubMatrix(row, column);
-
-        if (!isNumberOfShipCorrect()) {
+        
+        if (!isSubMatrixEmpty()) {
 
             this.shipsToPlace++;
             System.out.println("SubMatriz no vacia");
@@ -276,7 +276,7 @@ public class Board extends Game {
             System.out.println("Barco no colocado");
             return;
         }
-
+        
         unsignEventSubMatrix();
 
         if (this.shipsToPlace == 0) {
@@ -383,11 +383,8 @@ public class Board extends Game {
         }
     }
 
-    private boolean isNumberOfShipCorrect() {
+    private boolean isSubMatrixEmpty() {
 
-        int counterOfShips = 0;
-
-        // this.shipsQuantity = this.shipData[this.currentShipIndex].getShipSize();
         for (int i = this.subMatrixSizes[0]; i <= this.subMatrixSizes[2]; i++) {
 
             for (int j = this.subMatrixSizes[1]; j <= this.subMatrixSizes[3]; j++) {
@@ -395,12 +392,13 @@ public class Board extends Game {
 
                     if (this.cells[i][j].getCellState() == 2) {
 
-                        counterOfShips++;
+                        return false;
                     }
                 }
             }
         }
-        return (counterOfShips == 0);
+        
+        return true;
     }
 
     private boolean placeShips(int row, int column) {
@@ -413,66 +411,101 @@ public class Board extends Game {
         if (isOutOfRange) {
             return false;
         }
+        
+        for (int i = 0; i < shipSize; i++) {
 
-        if (this.isShipHorizontal) {
+            int currentRow = row;
+            int currentColumn = column;
 
-            for (int i = 0; i < shipSize; i++) {
-
-                this.cells[row][column + i].setCellColor("#99FF00");
-                this.cells[row][column + i].setCellState(2);
+            if (this.isShipHorizontal) {
+                currentColumn += i;
+            } else {
+                currentRow += i;
             }
-        } else {
 
-            for (int i = 0; i < shipSize; i++) {
-
-                this.cells[row + i][column].setCellColor("#99FF00");
-                this.cells[row + i][column].setCellState(2);
-            }
+            this.cells[currentRow][currentColumn].setCellColor("#99FF00");
+            this.cells[currentRow][currentColumn].setCellState(2);
         }
-
         return true;
     }
 
-    private void shipPreview(int row, int column) {
+    private String getDefaultColorForState(int state) {
 
+        final String green = "#99FF00", red = "#FFFFFF", teal = "#009999", lightTeal = "#48B2B2";
+
+        if (state == 0) {
+            return teal;
+        }
+        if (state == 1) {
+            return lightTeal;
+        }
+        if (state == 2) {
+            return green;
+        }
+        return red;
+    }
+
+    private void shipPreview(int row, int column) {
+        
         if (this.areShipsPlaced) {
             return;
         }
 
-        int shipSize = shipData[this.currentShipIndex].getShipSize();
+        int shipSize = this.shipData[this.currentShipIndex].getShipSize();
 
-        boolean isFirstCellBlocked = (this.cells[row][column].getCellState() == 1);
-        boolean isAShip = (this.cells[row][column].getCellState() == 2);
-        boolean isFirstCellFree = (this.cells[row][column].getCellState() == 0);
-        boolean isOutOfRange = (this.isShipHorizontal) && (column + shipSize > this.matrixSizeColumn)
-                || (this.isShipVertical) && (row + shipSize > this.matrixSizeRow);
-
-        final String[] defaultColors = {"009999", "99FF00", "48B2B2"};
-
-        if (isFirstCellBlocked) {
-
-            this.cells[row][column].setCellColor("FF0000");
-            this.cells[row][column].getCellBox().setOnMouseExited(e -> this.cells[row][column].setCellColor("48B2B2"));
-
-        }
-        if (isAShip) {
-
-            this.cells[row][column].setCellColor("FF0000");
-            this.cells[row][column].getCellBox().setOnMouseExited(e -> this.cells[row][column].setCellColor("99FF00"));
-        }
-
-        if (isFirstCellFree) {
-
-            this.cells[row][column].setCellColor("99FF00");
-            this.cells[row][column].getCellBox().setOnMouseExited(e -> this.cells[row][column].setCellColor("009999"));
-        }
+        boolean isOutOfRange = (this.isShipHorizontal && (column + shipSize > this.matrixSizeColumn)) 
+                || (this.isShipVertical && (row + shipSize > this.matrixSizeRow));
 
         if (isOutOfRange) {
+            this.cells[row][column].setCellColor("#FF0000");
 
-            this.cells[row][column].setCellColor("FF0000");
-            this.cells[row][column].getCellBox().setOnMouseExited(
-                    e -> this.cells[row][column].setCellColor("009999"));
+            this.cells[row][column].getCellBox().setOnMouseExited(e -> {
+                String previousColor = getDefaultColorForState(this.cells[row][column].getCellState());
+                this.cells[row][column].setCellColor(previousColor);
+            });
+            return;
         }
+
+        String[] originalColors = new String[shipSize];
+
+        for (int i = 0; i < shipSize; i++) {
+            
+            int currentRow = row;
+            int currentColumn = column;
+
+            if (this.isShipHorizontal) {
+                currentColumn += i;
+            } else {
+                currentRow += i;
+            }
+
+            originalColors[i] = this.cells[currentRow][currentColumn].getCellColor();
+
+            if (this.cells[currentRow][currentColumn].getCellState() == 0) {
+                
+                this.cells[currentRow][currentColumn].setCellColor("#99FF00");
+                
+            } else {
+                
+                this.cells[currentRow][currentColumn].setCellColor("#FF0000");
+            }
+        }
+
+        this.cells[row][column].getCellBox().setOnMouseExited(e -> {
+            
+            for (int i = 0; i < shipSize; i++) {
+                int currentRow = row;
+                int currentCol = column;
+
+                if (this.isShipHorizontal) {
+                    currentCol += i;
+                } else {
+                    currentRow += i;
+                }
+
+                this.cells[currentRow][currentCol].setCellColor(originalColors[i]);
+            }
+        });
     }
 
     private void unsignEventCompleteMatrix() {
