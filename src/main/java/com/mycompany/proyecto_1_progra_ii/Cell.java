@@ -8,12 +8,13 @@ public class Cell {
 
     private Rectangle cellBox;
     private int cellState;
-    
+    private String cellColor;
     
     public Cell(double pCellsPostionX, double pCellsPositionY, int pCellType){
         
         this.cellBox = new Rectangle(pCellsPostionX, pCellsPositionY, 30, 30);
-        this.cellBox.setFill(Color.web("009999"));
+        this.cellColor = "009999";
+        this.cellBox.setFill(Color.web(this.cellColor));
         this.cellBox.setStroke(Color.BLACK);
         this.cellBox.setStrokeWidth(1);
 
@@ -35,13 +36,23 @@ public class Cell {
         return this.cellBox;
     }
     
+    public String getCellColor(){
+        return this.cellColor;
+    }
+    
     public void drawCell(AnchorPane pCellAnchorPane){
         
         pCellAnchorPane.getChildren().add(this.cellBox);
     }
     
-    public void changeCellColor(String pColor){
+    public void setCellColor(String pColor){
         
         this.cellBox.setFill(Color.web(pColor));
-    }    
+    } 
+    
+    public void setCellStrokeColor(String pColor) {
+
+        this.cellColor = pColor;
+        this.cellBox.setStroke(Color.web(this.cellColor));
+    }
 }

@@ -110,7 +110,7 @@ public class MenuController {
 
             player1Board = new Board(game, 15, 60, 1);
 
-            player2Board = new Board(game, 350, 60, 2);
+            player2Board = new Board(game, 450, 60, 2);
 
             this.player1 = new Player(this.playerNameField.getText(), this.player1Board);
 
@@ -118,7 +118,7 @@ public class MenuController {
 
             disableMenuComponents();
 
-            double windowWidth = 650, windowHeight = 600;
+            double windowWidth = 850, windowHeight = 600;
             
             Main.resizeWindow(windowWidth, windowHeight);
             this.gameAnchorPane.setPrefWidth(windowWidth);

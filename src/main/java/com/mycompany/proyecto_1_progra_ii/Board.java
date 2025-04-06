@@ -4,7 +4,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.Cursor;
 import javafx.scene.control.Button;
-import javafx.scene.layout.Background;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 
 public class Board extends Game {
@@ -15,20 +15,22 @@ public class Board extends Game {
 
     public double boardWidth, boardHeight, firstCellPositionX, firstCellPositionY;
 
-    public ShipData[] shipData = {ShipData.SUBMARINE, ShipData.DESTROYER, 
+    public ShipData[] shipData = {ShipData.SUBMARINE, ShipData.DESTROYER,
         ShipData.CRUISER, ShipData.BATTLESHIP};
-    
-    private Text instructionText, currentShipNameText, placedShipsText;
-    
-    private boolean isShipVertical = false, isShipHorizontal = false;
-    
-    private boolean areShipsPlaced = false;
-    
-    private Button verticalShipButton, horizontalShipButton;
-    
-    private int shipsToPlace = this.shipData[this.currentShipIndex].getShipQuantity();
-    private int shipsPlaced = 0;
 
+    private Text instructionText, currentShipNameText, placedShipsText;
+
+    private boolean isShipVertical = true, isShipHorizontal = false;
+
+    private boolean areShipsPlaced = false;
+
+    private Button verticalShipButton, horizontalShipButton;
+
+    private int shipsToPlace = this.shipData[this.currentShipIndex].getShipQuantity();
+
+    private int shipsQuantity = this.shipData[this.currentShipIndex].getShipSize();
+
+    private int[] subMatrixSizes = {0, 0, 0, 0};
 
     public Board(Game pGame, double pFirstCellPositionX, double pFirstCellPositionY,
             int pBoardType) {
@@ -43,29 +45,29 @@ public class Board extends Game {
         fillBoard();
     }
 
-    private void defineTexts(){
-        
+    private void defineTexts() {
+
         this.instructionText = new Text(" ");
         this.instructionText.setLayoutX(0);
         this.instructionText.setLayoutY(0);
         this.instructionText.setFill(Color.WHITE);
-        
+
         this.currentShipNameText = new Text(" ");
         this.currentShipNameText.setLayoutX(0);
         this.currentShipNameText.setLayoutY(0);
         this.currentShipNameText.setFill(Color.WHITE);
-        
+
         this.placedShipsText = new Text(" ");
         this.placedShipsText.setLayoutX(0);
         this.placedShipsText.setLayoutY(0);
         this.placedShipsText.setFill(Color.WHITE);
     }
-    
+
     private void fillBoard() {
 
         if (this.difficulty == 1) {
 
-            this.matrixSizeRow = 9;
+            this.matrixSizeRow = 12;
             this.matrixSizeColumn = 9;
 
             this.boardWidth = this.matrixSizeColumn * 30;
@@ -78,7 +80,7 @@ public class Board extends Game {
         if (this.difficulty == 2) {
 
             this.matrixSizeRow = 12;
-            this.matrixSizeColumn = 9;
+            this.matrixSizeColumn = 11;
 
             this.boardWidth = this.matrixSizeColumn * 30;
             this.boardHeight = this.matrixSizeRow * 30;
@@ -90,7 +92,7 @@ public class Board extends Game {
         if (this.difficulty == 3) {
 
             this.matrixSizeRow = 12;
-            this.matrixSizeColumn = 12;
+            this.matrixSizeColumn = 13;
 
             this.boardWidth = this.matrixSizeColumn * 30;
             this.boardHeight = this.matrixSizeRow * 30;
@@ -117,33 +119,39 @@ public class Board extends Game {
 
                 auxPositionX += CELLS_SPACING;
 
-                final int row = i, column = j;
-                
+                final int ROW = i, COLUMN = j;
+
                 if (this.boardType == 1 && !this.areShipsPlaced) {
 
-                    this.cells[i][j].getCellBox().setOnMouseClicked(event -> 
-                            manageShipsQuantity(row, column));
+                    this.cells[i][j].getCellBox().setOnMouseClicked(event
+                            -> manageShipsQuantity(ROW, COLUMN));
+
                     this.cells[i][j].getCellBox().setOnMouseEntered(e
-                            -> this.cells[row][column].getCellBox().setCursor(Cursor.HAND));
+                            -> this.cells[ROW][COLUMN].getCellBox().setCursor(Cursor.HAND));
+
+                    this.cells[i][j].getCellBox().addEventHandler(MouseEvent.MOUSE_ENTERED, e -> {
+                        shipPreview(ROW, COLUMN);
+                    });
+
                     this.cells[i][j].getCellBox().setOnMouseExited(e
-                            -> this.cells[row][column].getCellBox().setCursor(Cursor.DEFAULT));
+                            -> this.cells[ROW][COLUMN].getCellBox().setCursor(Cursor.DEFAULT));
                 }
-                
+
                 if (this.boardType == 2) {
 
-                    this.cells[i][j].getCellBox().setOnMouseClicked(envet
-                            -> this.cells[row][column].getCellBox().setFill(Color.web("66FFFF")));
+                    this.cells[i][j].getCellBox().setOnMouseClicked(e
+                            -> this.cells[ROW][COLUMN].setCellColor("66FFFF"));
                     this.cells[i][j].getCellBox().setOnMouseEntered(e
-                            -> this.cells[row][column].getCellBox().setCursor(Cursor.CROSSHAIR));
+                            -> this.cells[ROW][COLUMN].getCellBox().setCursor(Cursor.CROSSHAIR));
                     this.cells[i][j].getCellBox().setOnMouseExited(e
-                            -> this.cells[row][column].getCellBox().setCursor(Cursor.DEFAULT));
+                            -> this.cells[ROW][COLUMN].getCellBox().setCursor(Cursor.DEFAULT));
                 }
             }
             auxPositionY += CELLS_SPACING;
         }
-       
+
     }
-    
+
     public void drawBoardComponents(AnchorPane pBoardAnchorPane) {
 
         for (int i = 0; i < this.matrixSizeRow; i++) {
@@ -153,9 +161,9 @@ public class Board extends Game {
                 this.cells[i][j].drawCell(pBoardAnchorPane);
             }
         }
-        
+
         if (this.boardType == 1) {
-            
+
             this.instructionText.setText("Haga clic en una celda para colocar los barcos: ");
 
             double instructionCenter = ((this.firstCellPositionX * 2
@@ -168,60 +176,60 @@ public class Board extends Game {
             this.verticalShipButton = new Button("Vertical");
 
             this.horizontalShipButton = new Button("Horizontal");
-            
+
             this.verticalShipButton.setPrefWidth(100);
-            
+
             this.horizontalShipButton.setPrefWidth(100);
-            
+
             double verticalButtonCenter = (this.firstCellPositionX);
-            
+
             double verticalShipY = this.firstCellPositionY + this.boardHeight + 100;
-            
+
             this.verticalShipButton.setLayoutX(verticalButtonCenter);
             this.verticalShipButton.setLayoutY(verticalShipY);
+            this.verticalShipButton.setStyle("-fx-background-color: #66FFFF;");
 
             this.horizontalShipButton.setLayoutX(verticalButtonCenter + 170);
             this.horizontalShipButton.setLayoutY(verticalShipY);
-            
-            
+
             pBoardAnchorPane.getChildren().add(this.instructionText);
             pBoardAnchorPane.getChildren().add(this.verticalShipButton);
             pBoardAnchorPane.getChildren().add(this.horizontalShipButton);
-            
+
             this.verticalShipButton.setDisable(true);
             this.verticalShipButton.setVisible(false);
 
             this.horizontalShipButton.setDisable(true);
             this.horizontalShipButton.setVisible(false);
-            
-            this.horizontalShipButton.setOnAction(event->horizontalButtonPressed());
-            this.verticalShipButton.setOnAction(event->verticalButtonPressed());
-            
+
+            this.horizontalShipButton.setOnAction(event -> horizontalButtonPressed());
+            this.verticalShipButton.setOnAction(event -> verticalButtonPressed());
+
         }
         pBoardAnchorPane.getChildren().add(this.currentShipNameText);
         pBoardAnchorPane.getChildren().add(this.placedShipsText);
-  
+
     }
 
     private void verticalButtonPressed() {
-        
+
         this.isShipVertical = true;
-        
+
         this.isShipHorizontal = false;
 
         this.horizontalShipButton.setStyle("-fx-background-color: #4DB3CC;");
-        
+
         this.verticalShipButton.setStyle("-fx-background-color: #66FFFF;");
     }
 
     private void horizontalButtonPressed() {
-        
+
         this.isShipHorizontal = true;
-        
+
         this.isShipVertical = false;
 
         this.horizontalShipButton.setStyle("-fx-background-color: #66FFFF;");
-        
+
         this.verticalShipButton.setStyle("-fx-background-color: #4DB3CC;");
     }
 
@@ -251,12 +259,25 @@ public class Board extends Game {
 
     private void manageShipsQuantity(int row, int column) {
 
-        this.cells[row][column].getCellBox().setFill(Color.web("99FF00"));
-        this.cells[row][column].setCellState(2);
-
         this.shipsToPlace--;
 
-        unsignEventPosition(row, column, shipData[this.currentShipIndex]);
+        buildSubMatrix(row, column);
+
+        if (!isNumberOfShipCorrect()) {
+
+            this.shipsToPlace++;
+            System.out.println("SubMatriz no vacia");
+            return;
+        }
+
+        if (!placeShips(row, column)) {
+
+            this.shipsToPlace++;
+            System.out.println("Barco no colocado");
+            return;
+        }
+
+        unsignEventSubMatrix();
 
         if (this.shipsToPlace == 0) {
 
@@ -281,7 +302,7 @@ public class Board extends Game {
 
                 this.placedShipsText.setLayoutX(placedShipsCenter);
 
-                unsignEventMatrix();
+                unsignEventCompleteMatrix();
 
                 return;
             }
@@ -300,8 +321,9 @@ public class Board extends Game {
         placedShipsData();
     }
 
-    private void unsignEventPosition(int row, int column, ShipData shipData) {
-        int shipSize = shipData.getShipSize();
+    private void buildSubMatrix(int row, int column) {
+
+        int shipSize = shipData[this.currentShipIndex].getShipSize();
 
         if (this.isShipHorizontal && (column + shipSize > this.matrixSizeColumn)) {
             return;
@@ -309,7 +331,7 @@ public class Board extends Game {
         if (this.isShipVertical && (row + shipSize > this.matrixSizeRow)) {
             return;
         }
-        
+
         int start_i = row - 1;
         int start_j = column - 1;
         int end_i, end_j;
@@ -330,68 +352,137 @@ public class Board extends Game {
             end_j = column + 1;
         }
 
-        for (int i = start_i; i <= end_i; i++) {
+        this.subMatrixSizes[0] = start_i;
+        this.subMatrixSizes[1] = start_j;
+        this.subMatrixSizes[2] = end_i;
+        this.subMatrixSizes[3] = end_j;
+    }
 
-            for (int j = start_j; j <= end_j; j++) {
+    private void unsignEventSubMatrix() {
+
+        for (int i = this.subMatrixSizes[0]; i <= this.subMatrixSizes[2]; i++) {
+
+            for (int j = this.subMatrixSizes[1]; j <= this.subMatrixSizes[3]; j++) {
 
                 if (i >= 0 && i < this.matrixSizeRow && j >= 0 && j < this.matrixSizeColumn) {
 
-                    final int ROW = i;
-                    final int COLUMN = j;
-
                     this.cells[i][j].getCellBox().setOnMouseClicked(null);
 
-                    this.cells[i][j].getCellBox().setOnMouseEntered(e
-                            -> this.cells[ROW][COLUMN].getCellBox().setCursor(Cursor.DEFAULT));
+                    if (this.cells[i][j].getCellState() == 0) {
 
-                    this.cells[i][j].getCellBox().setOnMouseExited(e
-                            -> this.cells[ROW][COLUMN].getCellBox().setCursor(Cursor.DEFAULT));
+                        this.cells[i][j].setCellColor("#48B2B2");
+                        this.cells[i][j].setCellState(1);
 
-                    this.cells[ROW][COLUMN].getCellBox().setFill(Color.web("rgba(128,128,128,0.3)"));
+                    } else if (this.cells[i][j].getCellState() == 2) {
 
-                    if (this.cells[ROW][COLUMN].getCellState() == 0) {
-
-                        Color original = Color.web("#66FFFF");
-                        Color slightlyDarker = original.deriveColor(0, 1, 0.70, 1);
-                        this.cells[i][j].getCellBox().setFill(slightlyDarker);
-
-                    } else if (this.cells[ROW][COLUMN].getCellState() == 2) {
-
-                        this.cells[i][j].getCellBox().setFill(Color.web("#99FF00"));
+                        this.cells[i][j].getCellBox().setOnMouseEntered(null);
+                        this.cells[i][j].getCellBox().setOnMouseExited(null);
                     }
                 }
             }
         }
+    }
 
-    if (this.isShipHorizontal) {
-        
-        for (int k = 0; k < shipSize; k++) {
-            
-            if (column + k < this.matrixSizeColumn) {
-                this.cells[row][column + k].getCellBox().setFill(Color.web("#99FF00"));
-                this.cells[row][column + k].setCellState(2);
+    private boolean isNumberOfShipCorrect() {
+
+        int counterOfShips = 0;
+
+        // this.shipsQuantity = this.shipData[this.currentShipIndex].getShipSize();
+        for (int i = this.subMatrixSizes[0]; i <= this.subMatrixSizes[2]; i++) {
+
+            for (int j = this.subMatrixSizes[1]; j <= this.subMatrixSizes[3]; j++) {
+                if (i >= 0 && i < this.matrixSizeRow && j >= 0 && j < this.matrixSizeColumn) {
+
+                    if (this.cells[i][j].getCellState() == 2) {
+
+                        counterOfShips++;
+                    }
+                }
             }
         }
-    } else {
-        for (int k = 0; k < shipSize; k++) {
-            
-            if (row + k < this.matrixSizeRow) {
-                this.cells[row + k][column].getCellBox().setFill(Color.web("#99FF00"));
-                this.cells[row + k][column].setCellState(2);
+        return (counterOfShips == 0);
+    }
+
+    private boolean placeShips(int row, int column) {
+
+        int shipSize = shipData[this.currentShipIndex].getShipSize();
+
+        boolean isOutOfRange = (this.isShipHorizontal) && (column + shipSize > this.matrixSizeColumn)
+                || (this.isShipVertical) && (row + shipSize > this.matrixSizeRow);
+
+        if (isOutOfRange) {
+            return false;
+        }
+
+        if (this.isShipHorizontal) {
+
+            for (int i = 0; i < shipSize; i++) {
+
+                this.cells[row][column + i].setCellColor("#99FF00");
+                this.cells[row][column + i].setCellState(2);
             }
+        } else {
+
+            for (int i = 0; i < shipSize; i++) {
+
+                this.cells[row + i][column].setCellColor("#99FF00");
+                this.cells[row + i][column].setCellState(2);
+            }
+        }
+
+        return true;
+    }
+
+    private void shipPreview(int row, int column) {
+
+        if (this.areShipsPlaced) {
+            return;
+        }
+
+        int shipSize = shipData[this.currentShipIndex].getShipSize();
+
+        boolean isFirstCellBlocked = (this.cells[row][column].getCellState() == 1);
+        boolean isAShip = (this.cells[row][column].getCellState() == 2);
+        boolean isFirstCellFree = (this.cells[row][column].getCellState() == 0);
+        boolean isOutOfRange = (this.isShipHorizontal) && (column + shipSize > this.matrixSizeColumn)
+                || (this.isShipVertical) && (row + shipSize > this.matrixSizeRow);
+
+        final String[] defaultColors = {"009999", "99FF00", "48B2B2"};
+
+        if (isFirstCellBlocked) {
+
+            this.cells[row][column].setCellColor("FF0000");
+            this.cells[row][column].getCellBox().setOnMouseExited(e -> this.cells[row][column].setCellColor("48B2B2"));
+
+        }
+        if (isAShip) {
+
+            this.cells[row][column].setCellColor("FF0000");
+            this.cells[row][column].getCellBox().setOnMouseExited(e -> this.cells[row][column].setCellColor("99FF00"));
+        }
+
+        if (isFirstCellFree) {
+
+            this.cells[row][column].setCellColor("99FF00");
+            this.cells[row][column].getCellBox().setOnMouseExited(e -> this.cells[row][column].setCellColor("009999"));
+        }
+
+        if (isOutOfRange) {
+
+            this.cells[row][column].setCellColor("FF0000");
+            this.cells[row][column].getCellBox().setOnMouseExited(
+                    e -> this.cells[row][column].setCellColor("009999"));
         }
     }
-}
 
-    
-    private void unsignEventMatrix() {
+    private void unsignEventCompleteMatrix() {
 
         for (int i = 0; i < this.matrixSizeRow; i++) {
 
             for (int j = 0; j < this.matrixSizeColumn; j++) {
 
                 final int ROW = i, COLUMN = j;
-                
+
                 this.cells[i][j].getCellBox().setOnMouseClicked(null);
 
                 this.cells[i][j].getCellBox().setOnMouseEntered(e
@@ -403,7 +494,7 @@ public class Board extends Game {
         }
     }
 
-     public double getMatrixSizeRow() {
+    public double getMatrixSizeRow() {
 
         return this.matrixSizeRow;
     }
@@ -431,5 +522,5 @@ public class Board extends Game {
     public double getFirstCellPostionY() {
 
         return this.firstCellPositionY;
-    }    
+    }
 }
