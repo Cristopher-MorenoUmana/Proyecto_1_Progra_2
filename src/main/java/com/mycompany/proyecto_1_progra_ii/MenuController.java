@@ -53,7 +53,6 @@ public class MenuController {
     
     private Board player2Board;
     
-    //private Label playerBoardLabel, pcBoardLabel;
     private Text playerBoardText, pcBoardText;
     
     @FXML
@@ -137,6 +136,8 @@ public class MenuController {
             player1Board.drawBoardComponents(gameAnchorPane);
             player2Board.drawBoardComponents(gameAnchorPane);
 
+            player2Board.placePCShips();
+            
             double board1Center = ((this.player1Board.firstCellPositionX * 2 +
                     (this.player1Board.boardWidth - this.playerBoardText.getBoundsInLocal().getWidth()))/2);
             

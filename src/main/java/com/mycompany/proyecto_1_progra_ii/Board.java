@@ -6,6 +6,7 @@ import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
+import java.util.Random;
 
 public class Board extends Game {
 
@@ -266,14 +267,12 @@ public class Board extends Game {
         if (!isSubMatrixEmpty()) {
 
             this.shipsToPlace++;
-            System.out.println("SubMatriz no vacia");
             return;
         }
 
         if (!placeShips(row, column)) {
 
             this.shipsToPlace++;
-            System.out.println("Barco no colocado");
             return;
         }
         
@@ -321,16 +320,56 @@ public class Board extends Game {
         placedShipsData();
     }
 
+    public void placePCShips() {
+        
+        Random random = new Random();
+        
+        int randomRow = 0;
+        int randomColumn = 0;
+        int randomShipOrientation = 0;
+        
+        while (!this.areShipsPlaced) {
+
+            randomShipOrientation = random.nextInt(2);
+
+            if (randomShipOrientation == 0) {
+                this.isShipHorizontal = true;
+                this.isShipVertical = false;
+            } else {
+                this.isShipVertical = true;
+                this.isShipHorizontal = false;
+            }
+
+            randomRow = random.nextInt(this.matrixSizeRow);
+            randomColumn = random.nextInt(this.matrixSizeColumn);
+
+            buildSubMatrix(randomRow, randomColumn);
+
+
+            if (isSubMatrixEmpty()) {
+                 if(placeShips(randomRow, randomColumn)){
+                     this.shipsToPlace--;
+                 }
+            } 
+
+            if (this.shipsToPlace == 0) {
+
+                this.currentShipIndex++;
+
+                if (this.currentShipIndex > 3) {
+                    System.out.println("Todos los barcos colocados");
+                    this.areShipsPlaced = true;
+                    return;
+                }
+                this.shipsToPlace = this.shipData[this.currentShipIndex].getShipQuantity();
+            }
+        }
+    }
+   
+    
     private void buildSubMatrix(int row, int column) {
 
         int shipSize = shipData[this.currentShipIndex].getShipSize();
-
-        if (this.isShipHorizontal && (column + shipSize > this.matrixSizeColumn)) {
-            return;
-        }
-        if (this.isShipVertical && (row + shipSize > this.matrixSizeRow)) {
-            return;
-        }
 
         int start_i = row - 1;
         int start_j = column - 1;
@@ -388,6 +427,7 @@ public class Board extends Game {
         for (int i = this.subMatrixSizes[0]; i <= this.subMatrixSizes[2]; i++) {
 
             for (int j = this.subMatrixSizes[1]; j <= this.subMatrixSizes[3]; j++) {
+                
                 if (i >= 0 && i < this.matrixSizeRow && j >= 0 && j < this.matrixSizeColumn) {
 
                     if (this.cells[i][j].getCellState() == 2) {
@@ -422,8 +462,11 @@ public class Board extends Game {
             } else {
                 currentRow += i;
             }
+            
+         //   if (this.boardType == 1) {
+                this.cells[currentRow][currentColumn].setCellColor("#99FF00");
+           // }
 
-            this.cells[currentRow][currentColumn].setCellColor("#99FF00");
             this.cells[currentRow][currentColumn].setCellState(2);
         }
         return true;
@@ -431,7 +474,7 @@ public class Board extends Game {
 
     private String getDefaultColorForState(int state) {
 
-        final String green = "#99FF00", red = "#FFFFFF", teal = "#009999", lightTeal = "#48B2B2";
+        final String green = "#99FF00", teal = "#009999", lightTeal = "#48B2B2";
 
         if (state == 0) {
             return teal;
@@ -442,7 +485,7 @@ public class Board extends Game {
         if (state == 2) {
             return green;
         }
-        return red;
+        return teal;
     }
 
     private void shipPreview(int row, int column) {
@@ -526,7 +569,12 @@ public class Board extends Game {
             }
         }
     }
-
+ 
+    public boolean getArePlayerShipsPlaced(){
+        
+        return this.areShipsPlaced;
+    }
+    
     public double getMatrixSizeRow() {
 
         return this.matrixSizeRow;
