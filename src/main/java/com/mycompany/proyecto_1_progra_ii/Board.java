@@ -8,10 +8,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import java.util.Random;
 
-public class Board extends Game {
+public class Board {
 
-    private Cell[][] cells;
-
+    private Cell[][] cells; 
+    
+    private int difficulty;
+    
     private int matrixSizeRow, matrixSizeColumn, boardType, currentShipIndex = 0;
 
     public double boardWidth, boardHeight, firstCellPositionX, firstCellPositionY;
@@ -19,24 +21,22 @@ public class Board extends Game {
     public ShipData[] shipData = {ShipData.SUBMARINE, ShipData.DESTROYER,
         ShipData.CRUISER, ShipData.BATTLESHIP};
 
-    private Text instructionText, currentShipNameText, placedShipsText;
+    private Text instructionText, currentShipNameText, placedShipsText, remainingShipsText;
 
     private boolean isShipVertical = true, isShipHorizontal = false;
 
     private boolean areShipsPlaced = false;
 
-    private Button verticalShipButton, horizontalShipButton;
+    private Button verticalShipButton, horizontalShipButton, showEnemyShips;
 
     private int shipsToPlace = this.shipData[this.currentShipIndex].getShipQuantity();
 
-    private int shipsQuantity = this.shipData[this.currentShipIndex].getShipSize();
-
     private int[] subMatrixSizes = {0, 0, 0, 0};
-
-    public Board(Game pGame, double pFirstCellPositionX, double pFirstCellPositionY,
+    
+    public Board(int pDifficulty, double pFirstCellPositionX, double pFirstCellPositionY,
             int pBoardType) {
 
-        super(pGame.difficulty);
+        this.difficulty = pDifficulty;
 
         this.firstCellPositionX = pFirstCellPositionX;
         this.firstCellPositionY = pFirstCellPositionY;
@@ -62,6 +62,13 @@ public class Board extends Game {
         this.placedShipsText.setLayoutX(0);
         this.placedShipsText.setLayoutY(0);
         this.placedShipsText.setFill(Color.WHITE);
+        
+        this.remainingShipsText = new Text("Barcos restantes: ");
+        this.remainingShipsText.setLayoutX(0);
+        this.remainingShipsText.setLayoutY(0);
+        this.remainingShipsText.setFill(Color.WHITE);
+        this.remainingShipsText.setDisable(true);
+        this.remainingShipsText.setVisible(false);
     }
 
     private void fillBoard() {
@@ -138,15 +145,6 @@ public class Board extends Game {
                             -> this.cells[ROW][COLUMN].getCellBox().setCursor(Cursor.DEFAULT));
                 }
 
-                if (this.boardType == 2) {
-
-                    this.cells[i][j].getCellBox().setOnMouseClicked(e
-                            -> this.cells[ROW][COLUMN].setCellColor("66FFFF"));
-                    this.cells[i][j].getCellBox().setOnMouseEntered(e
-                            -> this.cells[ROW][COLUMN].getCellBox().setCursor(Cursor.CROSSHAIR));
-                    this.cells[i][j].getCellBox().setOnMouseExited(e
-                            -> this.cells[ROW][COLUMN].getCellBox().setCursor(Cursor.DEFAULT));
-                }
             }
             auxPositionY += CELLS_SPACING;
         }
@@ -207,9 +205,14 @@ public class Board extends Game {
             this.verticalShipButton.setOnAction(event -> verticalButtonPressed());
 
         }
+        if(this.boardType == 2){
+            
+            this.showEnemyShips = new Button("Mostrar Barcos");
+            this.showEnemyShips.setPrefWidth(100);
+        }
         pBoardAnchorPane.getChildren().add(this.currentShipNameText);
         pBoardAnchorPane.getChildren().add(this.placedShipsText);
-
+        pBoardAnchorPane.getChildren().add(this.remainingShipsText);
     }
 
     private void verticalButtonPressed() {
@@ -283,6 +286,7 @@ public class Board extends Game {
             this.currentShipIndex++;
 
             if (this.currentShipIndex > 3) {
+                
                 this.verticalShipButton.setDisable(true);
                 this.verticalShipButton.setVisible(false);
 
@@ -292,15 +296,27 @@ public class Board extends Game {
                 this.areShipsPlaced = true;
 
                 this.placedShipsText.setText("Todos los barcos colocados.");
-
+                
                 double placedShipsCenter = ((this.firstCellPositionX * 2
                         + (this.boardWidth - this.placedShipsText.getBoundsInLocal().getWidth())) / 2);
 
+                double remainingShipsCenter = ((this.firstCellPositionX * 2
+                        + (this.boardWidth - this.remainingShipsText.getBoundsInLocal().getWidth())) / 2); 
+                
+                this.remainingShipsText.setLayoutX(remainingShipsCenter);
+                this.remainingShipsText.setLayoutY(this.firstCellPositionY + this.boardWidth + 110);
+                
+                this.remainingShipsText.setDisable(false);
+                this.remainingShipsText.setVisible(true);
+                
                 this.currentShipNameText.setDisable(true);
                 this.currentShipNameText.setVisible(false);
 
                 this.placedShipsText.setLayoutX(placedShipsCenter);
 
+                this.instructionText.setDisable(true);
+                this.instructionText.setVisible(false);
+                
                 unsignEventCompleteMatrix();
 
                 return;
@@ -310,6 +326,7 @@ public class Board extends Game {
         }
 
         if (this.currentShipIndex > 0 && this.currentShipIndex <= 3) {
+            
             this.verticalShipButton.setDisable(false);
             this.verticalShipButton.setVisible(true);
 
@@ -324,9 +341,9 @@ public class Board extends Game {
         
         Random random = new Random();
         
-        int randomRow = 0;
-        int randomColumn = 0;
-        int randomShipOrientation = 0;
+        int randomRow;
+        int randomColumn;
+        int randomShipOrientation;
         
         while (!this.areShipsPlaced) {
 
@@ -357,16 +374,25 @@ public class Board extends Game {
                 this.currentShipIndex++;
 
                 if (this.currentShipIndex > 3) {
-                    System.out.println("Todos los barcos colocados");
+
                     this.areShipsPlaced = true;
-                    return;
+
+                    double remainingShipsCenter = ((this.firstCellPositionX * 2
+                            + (this.boardWidth - this.remainingShipsText.getBoundsInLocal().getWidth())) / 2);
+
+                    this.remainingShipsText.setLayoutX(remainingShipsCenter);
+                    this.remainingShipsText.setLayoutY(this.firstCellPositionY + this.boardWidth + 110);
+
+                    this.remainingShipsText.setDisable(false);
+                    this.remainingShipsText.setVisible(true);
+
+                    break;
                 }
                 this.shipsToPlace = this.shipData[this.currentShipIndex].getShipQuantity();
             }
         }
     }
    
-    
     private void buildSubMatrix(int row, int column) {
 
         int shipSize = shipData[this.currentShipIndex].getShipSize();
@@ -462,10 +488,10 @@ public class Board extends Game {
             } else {
                 currentRow += i;
             }
-            
-         //   if (this.boardType == 1) {
+      
+            if (this.boardType == 1) {
                 this.cells[currentRow][currentColumn].setCellColor("#99FF00");
-           // }
+            }
 
             this.cells[currentRow][currentColumn].setCellState(2);
         }
@@ -603,5 +629,13 @@ public class Board extends Game {
     public double getFirstCellPostionY() {
 
         return this.firstCellPositionY;
+    }
+    
+    public Cell getCell(int row, int column){
+        return this.cells[row][column];
+    }
+    
+    public Text getRemainingShips(){
+        return this.remainingShipsText;
     }
 }

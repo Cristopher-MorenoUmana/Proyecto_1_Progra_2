@@ -10,7 +10,6 @@ import javafx.event.ActionEvent;
 import java.io.IOException;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
-import javafx.scene.paint.Color;
 
 
 public class MenuController {
@@ -44,17 +43,9 @@ public class MenuController {
     private boolean isDifficultySelected;
 
     private int difficultyNumber = 0;
-
-    private Player player1, player2;
     
     private Game game;
-
-    private Board player1Board;
-    
-    private Board player2Board;
-    
-    private Text playerBoardText, pcBoardText;
-    
+        
     @FXML
     private void handleDifficultyButtons(ActionEvent event) {
 
@@ -99,65 +90,27 @@ public class MenuController {
 
         boolean isValidData = (isDifficultySelected)
                 && (playerNameField.getText().isEmpty() == false);
-       
 
-        if (isValidData) {
-
-            this.dataErrorLabel.setVisible(false);
-
-            this.game = new Game(this.difficultyNumber);
-
-            player1Board = new Board(game, 15, 60, 1);
-
-            player2Board = new Board(game, 450, 60, 2);
-
-            this.player1 = new Player(this.playerNameField.getText(), this.player1Board);
-
-            this.player2 = new Player("PC", this.player2Board);
-
-            disableMenuComponents();
-
-            double windowWidth = 850, windowHeight = 600;
-            
-            Main.resizeWindow(windowWidth, windowHeight);
-            this.gameAnchorPane.setPrefWidth(windowWidth);
-            this.gameAnchorPane.setPrefHeight(windowHeight);
-            
-            this.playerBoardText = new Text("Tablero de: " + this.player1.getPlayerName());
-
-            this.pcBoardText = new Text("Tablero de: " + this.player2.getPlayerName());
-
-            this.playerBoardText.setFill(Color.WHITE);
-            this.pcBoardText.setFill(Color.WHITE);
-            
-            this.gameAnchorPane.getChildren().add(playerBoardText);
-            this.gameAnchorPane.getChildren().add(pcBoardText);
-
-            player1Board.drawBoardComponents(gameAnchorPane);
-            player2Board.drawBoardComponents(gameAnchorPane);
-
-            player2Board.placePCShips();
-            
-            double board1Center = ((this.player1Board.firstCellPositionX * 2 +
-                    (this.player1Board.boardWidth - this.playerBoardText.getBoundsInLocal().getWidth()))/2);
-            
-            double board2Center = ((this.player2Board.firstCellPositionX * 2 +
-                    (this.player2Board.boardWidth - this.pcBoardText.getBoundsInLocal().getWidth()))/2);
-            
-            this.playerBoardText.setLayoutX(board1Center);
-            this.pcBoardText.setLayoutX(board2Center);
-            
- 
-            this.playerBoardText.setLayoutY(this.player1Board.getFirstCellPostionY() - 10);
-            this.pcBoardText.setLayoutY(this.player2Board.getFirstCellPostionY() - 10);
-
-                       
-
-        } else {
+        if (!isValidData) {
             this.dataErrorLabel.setVisible(true);
+            return;
         }
+
+        this.dataErrorLabel.setVisible(false);
+
+        disableMenuComponents();
+
+        double windowWidth = 850, windowHeight = 600;
+
+        Main.resizeWindow(windowWidth, windowHeight);
+        this.gameAnchorPane.setPrefWidth(windowWidth);
+        this.gameAnchorPane.setPrefHeight(windowHeight);
+
+        this.game = new Game(this.playerNameField.getText(), this.difficultyNumber,
+                this.gameAnchorPane);
+
     }
-    
+
     private void disableMenuComponents ()
     {
         this.playButton.setVisible(false);
