@@ -102,6 +102,22 @@ public class MenuController {
 
         double windowWidth = 850, windowHeight = 600;
 
+        if (this.difficultyNumber == 1) {
+
+            windowWidth = 630;
+            windowHeight = 600;
+        }
+        if (this.difficultyNumber == 2) {
+
+            windowWidth = 750;
+            windowHeight = 600;
+        }
+        if (this.difficultyNumber == 3) {
+
+            windowWidth = 870;
+            windowHeight = 600;
+        }
+        
         Main.resizeWindow(windowWidth, windowHeight);
         this.gameAnchorPane.setPrefWidth(windowWidth);
         this.gameAnchorPane.setPrefHeight(windowHeight);

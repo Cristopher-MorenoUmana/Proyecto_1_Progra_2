@@ -27,11 +27,17 @@ public class Board {
 
     private boolean areShipsPlaced = false;
 
-    private Button verticalShipButton, horizontalShipButton, showEnemyShips;
+    private boolean isShowEnemyShipsActive = false, isShowIslansActive = false;
+    
+    private Button verticalShipButton, horizontalShipButton, showEnemyShipsButton;
 
+    private Button showEnemyIslandsButton;
+    
     private int shipsToPlace = this.shipData[this.currentShipIndex].getShipQuantity();
 
     private int[] subMatrixSizes = {0, 0, 0, 0};
+    
+    private int islansQuantity = 0;
     
     public Board(int pDifficulty, double pFirstCellPositionX, double pFirstCellPositionY,
             int pBoardType) {
@@ -83,6 +89,8 @@ public class Board {
 
             this.cells = new Cell[matrixSizeRow][matrixSizeColumn];
 
+            this.islansQuantity = 10;
+            
             fillMatrix();
         }
         if (this.difficulty == 2) {
@@ -95,6 +103,8 @@ public class Board {
 
             this.cells = new Cell[matrixSizeRow][matrixSizeColumn];
 
+            this.islansQuantity = 15;
+            
             fillMatrix();
         }
         if (this.difficulty == 3) {
@@ -107,6 +117,8 @@ public class Board {
 
             this.cells = new Cell[matrixSizeRow][matrixSizeColumn];
 
+            this.islansQuantity = 20;
+            
             fillMatrix();
         }
     }
@@ -151,6 +163,19 @@ public class Board {
 
     }
 
+    //Formula: (2z+(x-y))/2 , z = primera celda, y = tamaño en pixeles de la figura x = ancho del tablero.
+    public double boardXCenterText(Text pTextToCenter){
+ 
+        return ((this.firstCellPositionX * 2
+                + (this.boardWidth - pTextToCenter.getBoundsInLocal().getWidth())) / 2);
+    }
+
+    public double boardXCenterButton(Button pButtonToCenter) {
+
+        return ((this.firstCellPositionX * 2
+                + (this.boardWidth -  pButtonToCenter.getPrefWidth())) / 2);
+    }
+
     public void drawBoardComponents(AnchorPane pBoardAnchorPane) {
 
         for (int i = 0; i < this.matrixSizeRow; i++) {
@@ -165,11 +190,9 @@ public class Board {
 
             this.instructionText.setText("Haga clic en una celda para colocar los barcos: ");
 
-            double instructionCenter = ((this.firstCellPositionX * 2
-                    + (this.boardWidth - this.instructionText.getBoundsInLocal().getWidth())) / 2);
             double instructionY = this.firstCellPositionY - 40;
 
-            this.instructionText.setLayoutX(instructionCenter);
+            this.instructionText.setLayoutX(boardXCenterText(this.instructionText));
             this.instructionText.setLayoutY(instructionY);
 
             this.verticalShipButton = new Button("Vertical");
@@ -180,15 +203,13 @@ public class Board {
 
             this.horizontalShipButton.setPrefWidth(100);
 
-            double verticalButtonCenter = (this.firstCellPositionX);
-
             double verticalShipY = this.firstCellPositionY + this.boardHeight + 100;
 
-            this.verticalShipButton.setLayoutX(verticalButtonCenter);
+            this.verticalShipButton.setLayoutX(this.firstCellPositionX);
             this.verticalShipButton.setLayoutY(verticalShipY);
             this.verticalShipButton.setStyle("-fx-background-color: #66FFFF;");
 
-            this.horizontalShipButton.setLayoutX(verticalButtonCenter + 170);
+            this.horizontalShipButton.setLayoutX(this.firstCellPositionX + this.boardWidth - 100);
             this.horizontalShipButton.setLayoutY(verticalShipY);
 
             pBoardAnchorPane.getChildren().add(this.instructionText);
@@ -207,8 +228,22 @@ public class Board {
         }
         if(this.boardType == 2){
             
-            this.showEnemyShips = new Button("Mostrar Barcos");
-            this.showEnemyShips.setPrefWidth(100);
+            this.showEnemyShipsButton = new Button("Mostrar Barcos");
+            this.showEnemyShipsButton.setPrefWidth(100);
+            
+            this.showEnemyShipsButton.setLayoutX(this.firstCellPositionX);
+            
+            this.showEnemyShipsButton.setOnAction(e -> showEnemyShipsPressed());
+            
+            this.showEnemyIslandsButton = new Button("Mostrar Islas");
+            this.showEnemyIslandsButton.setPrefWidth(100);
+            
+            this.showEnemyIslandsButton.setLayoutX(this.firstCellPositionX + this.boardWidth - 100);           
+            this.showEnemyIslandsButton.setOnAction(e ->  showIslandsPressed());
+            
+            
+            pBoardAnchorPane.getChildren().add(this.showEnemyShipsButton);
+            pBoardAnchorPane.getChildren().add(this.showEnemyIslandsButton);
         }
         pBoardAnchorPane.getChildren().add(this.currentShipNameText);
         pBoardAnchorPane.getChildren().add(this.placedShipsText);
@@ -220,7 +255,7 @@ public class Board {
         this.isShipVertical = true;
 
         this.isShipHorizontal = false;
-
+        
         this.horizontalShipButton.setStyle("-fx-background-color: #4DB3CC;");
 
         this.verticalShipButton.setStyle("-fx-background-color: #66FFFF;");
@@ -237,27 +272,81 @@ public class Board {
         this.verticalShipButton.setStyle("-fx-background-color: #4DB3CC;");
     }
 
+    private void showEnemyShipsPressed() {
+
+        this.isShowEnemyShipsActive = !this.isShowEnemyShipsActive;
+        
+        final String ORANGE = "#FF6C00", TEAL = "#009999";
+
+        for (int i = 0; i < this.matrixSizeRow; i++) {
+            for (int j = 0; j < this.matrixSizeColumn; j++) {
+
+                if (this.isShowEnemyShipsActive) {
+
+                    if (this.cells[i][j].getCellState() == 2) {
+                        this.cells[i][j].setCellColor(ORANGE);
+                    }
+                } else {
+
+                    if (this.cells[i][j].getCellState() == 2) {
+                        this.cells[i][j].setCellColor(TEAL);
+                    }
+                }
+            }
+        }
+        
+        if (this.isShowEnemyShipsActive) {
+            this.showEnemyShipsButton.setStyle("-fx-background-color: #66FFFF;");
+        } else {
+            this.showEnemyShipsButton.setStyle("-fx-background-color: #4DB3CC;");
+        }
+    }
+
+    private void showIslandsPressed(){
+        
+        this.isShowIslansActive = !this.isShowIslansActive;
+        
+        final String YELLOW = "#FFFF00", TEAL = "#009999";
+
+        for (int i = 0; i < this.matrixSizeRow; i++) {
+            for (int j = 0; j < this.matrixSizeColumn; j++) {
+
+                if (this.isShowIslansActive) {
+
+                    if (this.cells[i][j].getCellState() == 3) {
+                        this.cells[i][j].setCellColor(YELLOW);
+                    }
+                } else {
+
+                    if (this.cells[i][j].getCellState() == 2) {
+                        this.cells[i][j].setCellColor(TEAL);
+                    }
+                }
+            }
+        }
+        
+        if (this.isShowIslansActive) {
+            this.showEnemyIslandsButton.setStyle("-fx-background-color: #66FFFF;");
+        } else {
+            this.showEnemyIslandsButton.setStyle("-fx-background-color: #4DB3CC;");
+        }
+    }
+            
     public void placedShipsData() {
 
         this.currentShipNameText.setText("Colocando barcos de tipo: " + this.shipData[this.currentShipIndex]);
 
-        double shipNameCenter = ((this.firstCellPositionX * 2
-                + (this.boardWidth - this.currentShipNameText.getBoundsInLocal().getWidth())) / 2);
-
         double shipNameY = this.firstCellPositionY + this.boardHeight + 40;
 
-        this.currentShipNameText.setLayoutX(shipNameCenter);
+        this.currentShipNameText.setLayoutX(boardXCenterText(this.currentShipNameText));
         this.currentShipNameText.setLayoutY(shipNameY);
 
         this.placedShipsText.setText("Cantidad de barcos de tipo por colocar: "
                 + this.shipsToPlace);
 
-        double placedShipsCenter = ((this.firstCellPositionX * 2
-                + (this.boardWidth - this.placedShipsText.getBoundsInLocal().getWidth())) / 2);
-
         double placedShipsY = this.firstCellPositionY + this.boardHeight + 70;
 
-        this.placedShipsText.setLayoutX(placedShipsCenter);
+        this.placedShipsText.setLayoutX(boardXCenterText(this.placedShipsText));
         this.placedShipsText.setLayoutY(placedShipsY);
     }
 
@@ -297,14 +386,8 @@ public class Board {
 
                 this.placedShipsText.setText("Todos los barcos colocados.");
                 
-                double placedShipsCenter = ((this.firstCellPositionX * 2
-                        + (this.boardWidth - this.placedShipsText.getBoundsInLocal().getWidth())) / 2);
-
-                double remainingShipsCenter = ((this.firstCellPositionX * 2
-                        + (this.boardWidth - this.remainingShipsText.getBoundsInLocal().getWidth())) / 2); 
-                
-                this.remainingShipsText.setLayoutX(remainingShipsCenter);
-                this.remainingShipsText.setLayoutY(this.firstCellPositionY + this.boardWidth + 110);
+                this.remainingShipsText.setLayoutX(boardXCenterText(this.remainingShipsText));
+                this.remainingShipsText.setLayoutY(this.firstCellPositionY + this.boardHeight + 20);
                 
                 this.remainingShipsText.setDisable(false);
                 this.remainingShipsText.setVisible(true);
@@ -312,7 +395,7 @@ public class Board {
                 this.currentShipNameText.setDisable(true);
                 this.currentShipNameText.setVisible(false);
 
-                this.placedShipsText.setLayoutX(placedShipsCenter);
+                this.placedShipsText.setLayoutX(boardXCenterText(this.placedShipsText));
 
                 this.instructionText.setDisable(true);
                 this.instructionText.setVisible(false);
@@ -381,7 +464,7 @@ public class Board {
                             + (this.boardWidth - this.remainingShipsText.getBoundsInLocal().getWidth())) / 2);
 
                     this.remainingShipsText.setLayoutX(remainingShipsCenter);
-                    this.remainingShipsText.setLayoutY(this.firstCellPositionY + this.boardWidth + 110);
+                    this.remainingShipsText.setLayoutY(this.firstCellPositionY + this.boardHeight + 20);
 
                     this.remainingShipsText.setDisable(false);
                     this.remainingShipsText.setVisible(true);
@@ -393,6 +476,38 @@ public class Board {
         }
     }
    
+    public void placeIslands(){
+ 
+        if(this.boardType == 1){
+            return;
+        }
+        
+        Random random = new Random();
+        int randomRow;
+        int randomColumn;
+
+        for (int i = 0; i < this.matrixSizeRow; i++) {
+
+            for (int j = 0; j < this.matrixSizeColumn; j++) {
+                
+                randomRow = random.nextInt(this.matrixSizeRow);
+                randomColumn = random.nextInt(this.matrixSizeColumn);
+   
+                boolean isValidCell = (this.cells[i][j].getCellState() == 0
+                        || this.cells[i][j].getCellState() == 1);
+                
+                
+                if(isValidCell){
+                    this.cells[randomRow][randomColumn].setCellState(3);
+                    this.islansQuantity--;
+                }
+                if (this.islansQuantity == 0) {
+                    return;
+                }
+            }
+        }
+    }
+    
     private void buildSubMatrix(int row, int column) {
 
         int shipSize = shipData[this.currentShipIndex].getShipSize();
@@ -520,13 +635,14 @@ public class Board {
             return;
         }
 
+        final String RED = "#FF0000";
         int shipSize = this.shipData[this.currentShipIndex].getShipSize();
 
         boolean isOutOfRange = (this.isShipHorizontal && (column + shipSize > this.matrixSizeColumn)) 
                 || (this.isShipVertical && (row + shipSize > this.matrixSizeRow));
 
         if (isOutOfRange) {
-            this.cells[row][column].setCellColor("#FF0000");
+            this.cells[row][column].setCellColor(RED);
 
             this.cells[row][column].getCellBox().setOnMouseExited(e -> {
                 String previousColor = getDefaultColorForState(this.cells[row][column].getCellState());
@@ -556,7 +672,7 @@ public class Board {
                 
             } else {
                 
-                this.cells[currentRow][currentColumn].setCellColor("#FF0000");
+                this.cells[currentRow][currentColumn].setCellColor(RED);
             }
         }
 
@@ -635,7 +751,15 @@ public class Board {
         return this.cells[row][column];
     }
     
-    public Text getRemainingShips(){
+    public Text getRemainingShipsText(){
         return this.remainingShipsText;
+    }
+    
+    public double getBoardWidth(){
+        return this.boardWidth;
+    }
+    
+    public double getBoardHeight(){
+        return this.boardHeight;
     }
 }
