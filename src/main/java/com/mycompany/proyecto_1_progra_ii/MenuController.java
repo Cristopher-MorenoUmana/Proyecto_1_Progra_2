@@ -124,7 +124,6 @@ public class MenuController {
 
         this.game = new Game(this.playerNameField.getText(), this.difficultyNumber,
                 this.gameAnchorPane);
-
     }
 
     private void disableMenuComponents ()

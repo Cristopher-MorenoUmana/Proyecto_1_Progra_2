@@ -33,7 +33,15 @@ public class Main extends Application {
             stage.setHeight(pHeight);
         }
     }
-    
+
+    static double getWindowWidth() {
+        return stage.getWidth();
+    }
+
+    static double getWindowHeight() {
+        return stage.getHeight();
+    }
+
     private static Parent loadFXML(String fxml) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource(fxml + ".fxml"));
         return fxmlLoader.load();
@@ -42,8 +50,8 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch();
     }
-    
-       public static Scene getScene() {
+
+    public static Scene getScene() {
         return scene;
     }
 

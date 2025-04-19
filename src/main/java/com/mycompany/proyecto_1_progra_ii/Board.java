@@ -12,14 +12,14 @@ import java.util.ArrayList;
 
 public class Board {
 
-    private Cell[][] cells; 
-    
+    private Cell[][] cells;
+
     private int difficulty;
-    
+
     private int matrixSizeRow, matrixSizeColumn, boardType, currentShipIndex = 0;
 
     private int remainingShips = 10, placedShips = 0;
-    
+
     public double boardWidth, boardHeight, firstCellPositionX, firstCellPositionY;
 
     public ShipData[] shipData = {ShipData.SUBMARINE, ShipData.DESTROYER,
@@ -32,19 +32,19 @@ public class Board {
     private boolean areShipsPlaced = false;
 
     private boolean isShowEnemyShipsActive = false, isShowIslansActive = false;
-    
+
     private Button verticalShipButton, horizontalShipButton, showEnemyShipsButton;
 
     private Button showEnemyIslandsButton;
-    
+
     private int shipsToPlace = this.shipData[this.currentShipIndex].getShipQuantity();
 
     private int[] subMatrixSizes = {0, 0, 0, 0};
-    
+
     private int islansQuantity = 0;
-    
+
     private List<Ship> shipsList = new ArrayList<>();
-    
+
     public Board(int pDifficulty, double pFirstCellPositionX, double pFirstCellPositionY,
             int pBoardType) {
 
@@ -74,7 +74,7 @@ public class Board {
         this.placedShipsText.setLayoutX(0.0);
         this.placedShipsText.setLayoutY(0.0);
         this.placedShipsText.setFill(Color.WHITE);
-        
+
         this.remainingShipsText = new Text("Barcos restantes: ");
         this.remainingShipsText.setLayoutX(0.0);
         this.remainingShipsText.setLayoutY(0.0);
@@ -95,8 +95,8 @@ public class Board {
 
             this.cells = new Cell[matrixSizeRow][matrixSizeColumn];
 
-            this.islansQuantity = 10;
-            
+            this.islansQuantity = 5;
+
             fillMatrix();
         }
         if (this.difficulty == 2) {
@@ -109,8 +109,8 @@ public class Board {
 
             this.cells = new Cell[matrixSizeRow][matrixSizeColumn];
 
-            this.islansQuantity = 15;
-            
+            this.islansQuantity = 7;
+
             fillMatrix();
         }
         if (this.difficulty == 3) {
@@ -123,8 +123,8 @@ public class Board {
 
             this.cells = new Cell[matrixSizeRow][matrixSizeColumn];
 
-            this.islansQuantity = 20;
-            
+            this.islansQuantity = 5;
+
             fillMatrix();
         }
     }
@@ -170,8 +170,8 @@ public class Board {
     }
 
     //Formula: (2z+(x-y))/2 , z = primera celda, y = tamaño en pixeles de la figura x = ancho del tablero.
-    public double boardXCenterText(Text pTextToCenter){
- 
+    public double boardXCenterText(Text pTextToCenter) {
+
         return ((this.firstCellPositionX * 2
                 + (this.boardWidth - pTextToCenter.getBoundsInLocal().getWidth())) / 2);
     }
@@ -179,7 +179,7 @@ public class Board {
     public double boardXCenterButton(Button pButtonToCenter) {
 
         return ((this.firstCellPositionX * 2
-                + (this.boardWidth -  pButtonToCenter.getPrefWidth())) / 2);
+                + (this.boardWidth - pButtonToCenter.getPrefWidth())) / 2);
     }
 
     public void drawBoardComponents(AnchorPane pBoardAnchorPane) {
@@ -232,22 +232,21 @@ public class Board {
             this.verticalShipButton.setOnAction(event -> verticalButtonPressed());
 
         }
-        if(this.boardType == 2){
-            
+        if (this.boardType == 2) {
+
             this.showEnemyShipsButton = new Button("Mostrar Barcos");
             this.showEnemyShipsButton.setPrefWidth(100);
-            
+
             this.showEnemyShipsButton.setLayoutX(this.firstCellPositionX);
-            
+
             this.showEnemyShipsButton.setOnAction(e -> showEnemyShipsPressed());
-            
+
             this.showEnemyIslandsButton = new Button("Mostrar Islas");
             this.showEnemyIslandsButton.setPrefWidth(100);
-            
-            this.showEnemyIslandsButton.setLayoutX(this.firstCellPositionX + this.boardWidth - 100);           
-            this.showEnemyIslandsButton.setOnAction(e ->  showIslandsPressed());
-            
-            
+
+            this.showEnemyIslandsButton.setLayoutX(this.firstCellPositionX + this.boardWidth - 100);
+            this.showEnemyIslandsButton.setOnAction(e -> showIslandsPressed());
+
             pBoardAnchorPane.getChildren().add(this.showEnemyShipsButton);
             pBoardAnchorPane.getChildren().add(this.showEnemyIslandsButton);
         }
@@ -261,7 +260,7 @@ public class Board {
         this.isShipVertical = true;
 
         this.isShipHorizontal = false;
-        
+
         this.horizontalShipButton.setStyle("-fx-background-color: #4DB3CC;");
 
         this.verticalShipButton.setStyle("-fx-background-color: #66FFFF;");
@@ -281,7 +280,7 @@ public class Board {
     private void showEnemyShipsPressed() {
 
         this.isShowEnemyShipsActive = !this.isShowEnemyShipsActive;
-        
+
         final String ORANGE = "#FF6C00", TEAL = "#009999";
 
         for (int i = 0; i < this.matrixSizeRow; i++) {
@@ -300,7 +299,7 @@ public class Board {
                 }
             }
         }
-        
+
         if (this.isShowEnemyShipsActive) {
             this.showEnemyShipsButton.setStyle("-fx-background-color: #66FFFF;");
         } else {
@@ -308,10 +307,10 @@ public class Board {
         }
     }
 
-    private void showIslandsPressed(){
-        
+    private void showIslandsPressed() {
+
         this.isShowIslansActive = !this.isShowIslansActive;
-        
+
         final String YELLOW = "#FFFF00", TEAL = "#009999";
 
         for (int i = 0; i < this.matrixSizeRow; i++) {
@@ -330,14 +329,14 @@ public class Board {
                 }
             }
         }
-        
+
         if (this.isShowIslansActive) {
             this.showEnemyIslandsButton.setStyle("-fx-background-color: #66FFFF;");
         } else {
             this.showEnemyIslandsButton.setStyle("-fx-background-color: #4DB3CC;");
         }
     }
-            
+
     public void placedShipsData() {
 
         this.currentShipNameText.setText("Colocando barcos de tipo: " + this.shipData[this.currentShipIndex]);
@@ -359,9 +358,9 @@ public class Board {
     private void manageShipsQuantity(int row, int column) {
 
         this.shipsToPlace--;
-        
+
         buildSubMatrix(row, column);
-        
+
         if (!isSubMatrixEmpty()) {
 
             this.shipsToPlace++;
@@ -373,7 +372,7 @@ public class Board {
             this.shipsToPlace++;
             return;
         }
-        
+
         unsignEventSubMatrix();
 
         if (this.shipsToPlace == 0) {
@@ -381,33 +380,32 @@ public class Board {
             this.currentShipIndex++;
 
             if (this.currentShipIndex > 3) {
-                
+
                 this.verticalShipButton.setDisable(true);
                 this.verticalShipButton.setVisible(false);
 
                 this.horizontalShipButton.setDisable(true);
                 this.horizontalShipButton.setVisible(false);
 
-                this.areShipsPlaced = true;
-
-                this.placedShipsText.setText("Todos los barcos colocados.");
-                
                 this.remainingShipsText.setLayoutX(boardXCenterText(this.remainingShipsText));
                 this.remainingShipsText.setLayoutY(this.firstCellPositionY + this.boardHeight + 20);
-                
+
                 this.remainingShipsText.setDisable(false);
                 this.remainingShipsText.setVisible(true);
-                
+
                 this.currentShipNameText.setDisable(true);
                 this.currentShipNameText.setVisible(false);
 
-                this.placedShipsText.setLayoutX(boardXCenterText(this.placedShipsText));
+                this.placedShipsText.setDisable(true);
+                this.placedShipsText.setVisible(false);
 
                 this.instructionText.setDisable(true);
                 this.instructionText.setVisible(false);
+
+                this.areShipsPlaced = true;
                 
                 unsignEventCompleteMatrix();
-
+                restoreblockedCells();
                 return;
             }
 
@@ -415,7 +413,7 @@ public class Board {
         }
 
         if (this.currentShipIndex > 0 && this.currentShipIndex <= 3) {
-            
+
             this.verticalShipButton.setDisable(false);
             this.verticalShipButton.setVisible(true);
 
@@ -426,14 +424,31 @@ public class Board {
         placedShipsData();
     }
 
+    public void restoreblockedCells() {
+
+        if (this.boardType == 2) {
+            return;
+        }
+
+        for (int i = 0; i < this.matrixSizeRow; i++) {
+            for (int j = 0; j < this.matrixSizeColumn; j++) {
+
+                if (this.cells[i][j].getCellState() == 1) {
+                    this.cells[i][j].setCellState(0);
+                    this.cells[i][j].setCellColor("#009999");
+                }
+            }
+        }
+    }
+
     public void placePCShips() {
-        
+
         Random random = new Random();
-        
+
         int randomRow;
         int randomColumn;
         int randomShipOrientation;
-        
+
         while (!this.areShipsPlaced) {
 
             randomShipOrientation = random.nextInt(2);
@@ -451,12 +466,11 @@ public class Board {
 
             buildSubMatrix(randomRow, randomColumn);
 
-
             if (isSubMatrixEmpty()) {
-                 if(placeShips(randomRow, randomColumn)){
-                     this.shipsToPlace--;
-                 }
-            } 
+                if (placeShips(randomRow, randomColumn)) {
+                    this.shipsToPlace--;
+                }
+            }
 
             if (this.shipsToPlace == 0) {
 
@@ -481,15 +495,15 @@ public class Board {
             }
         }
     }
-   
-    public void placeIslands(){
+
+    public void placeIslands() {
 
         if (this.boardType == 1) {
             return;
         }
 
         while (this.islansQuantity != 0) {
-            
+
             Random random = new Random();
             int randomRow = random.nextInt(this.matrixSizeRow);
             int randomColumn = random.nextInt(this.matrixSizeColumn);
@@ -503,7 +517,7 @@ public class Board {
             }
         }
     }
-    
+
     private void buildSubMatrix(int row, int column) {
 
         int shipSize = shipData[this.currentShipIndex].getShipSize();
@@ -564,7 +578,7 @@ public class Board {
         for (int i = this.subMatrixSizes[0]; i <= this.subMatrixSizes[2]; i++) {
 
             for (int j = this.subMatrixSizes[1]; j <= this.subMatrixSizes[3]; j++) {
-                
+
                 if (i >= 0 && i < this.matrixSizeRow && j >= 0 && j < this.matrixSizeColumn) {
 
                     if (this.cells[i][j].getCellState() == 2) {
@@ -574,31 +588,31 @@ public class Board {
                 }
             }
         }
-        
+
         return true;
     }
-    
+
     private boolean placeShips(int row, int column) {
 
         int shipSize = shipData[this.currentShipIndex].getShipSize();
-        
+
         boolean isOutOfRange = (this.isShipHorizontal) && (column + shipSize > this.matrixSizeColumn)
                 || (this.isShipVertical) && (row + shipSize > this.matrixSizeRow);
 
         if (isOutOfRange) {
             return false;
         }
-        
+
         List<int[]> position = new ArrayList<>();
-        
+
         Orientation shipOrientation = null;
-        
-        if(this.isShipHorizontal){
+
+        if (this.isShipHorizontal) {
             shipOrientation = Orientation.HORIZONTAL;
-        }else{
+        } else {
             shipOrientation = Orientation.VERTICAL;
         }
-        
+
         for (int i = 0; i < shipSize; i++) {
 
             int currentRow = row;
@@ -609,7 +623,7 @@ public class Board {
             } else {
                 currentRow += i;
             }
-      
+
             if (this.boardType == 1) {
                 this.cells[currentRow][currentColumn].setCellColor("#99FF00");
             }
@@ -617,11 +631,11 @@ public class Board {
             this.cells[currentRow][currentColumn].setCellState(2);
             position.add(new int[]{currentRow, currentColumn});
         }
-        
+
         Ship newShip = new Ship(this.shipData[this.currentShipIndex], position, shipOrientation);
         this.shipsList.add(newShip);
         this.placedShips++;
-        
+
         return true;
     }
 
@@ -642,7 +656,7 @@ public class Board {
     }
 
     private void shipPreview(int row, int column) {
-        
+
         if (this.areShipsPlaced) {
             return;
         }
@@ -650,7 +664,7 @@ public class Board {
         final String RED = "#FF0000";
         int shipSize = this.shipData[this.currentShipIndex].getShipSize();
 
-        boolean isOutOfRange = (this.isShipHorizontal && (column + shipSize > this.matrixSizeColumn)) 
+        boolean isOutOfRange = (this.isShipHorizontal && (column + shipSize > this.matrixSizeColumn))
                 || (this.isShipVertical && (row + shipSize > this.matrixSizeRow));
 
         if (isOutOfRange) {
@@ -666,7 +680,7 @@ public class Board {
         String[] originalColors = new String[shipSize];
 
         for (int i = 0; i < shipSize; i++) {
-            
+
             int currentRow = row;
             int currentColumn = column;
 
@@ -679,17 +693,17 @@ public class Board {
             originalColors[i] = this.cells[currentRow][currentColumn].getCellColor();
 
             if (this.cells[currentRow][currentColumn].getCellState() == 0) {
-                
+
                 this.cells[currentRow][currentColumn].setCellColor("#99FF00");
-                
+
             } else {
-                
+
                 this.cells[currentRow][currentColumn].setCellColor(RED);
             }
         }
 
         this.cells[row][column].getCellBox().setOnMouseExited(e -> {
-            
+
             for (int i = 0; i < shipSize; i++) {
                 int currentRow = row;
                 int currentCol = column;
@@ -723,18 +737,52 @@ public class Board {
             }
         }
     }
- 
-    public boolean getArePlayerShipsPlaced(){
-        
+
+    public void blockClicks(boolean isClickBlocked) {
+
+        for (int i = 0; i < this.matrixSizeRow; i++) {
+            for (int j = 0; j < this.matrixSizeColumn; j++) {
+
+                this.cells[i][j].getCellBox().setDisable(isClickBlocked);
+            }
+        }
+    }
+
+    public void disableBoardAndComponents() {
+
+        for (int i = 0; i < this.matrixSizeRow; i++) {
+            for (int j = 0; j < this.matrixSizeColumn; j++) {
+
+                this.cells[i][j].getCellBox().setDisable(true);
+                this.cells[i][j].getCellBox().setVisible(false);
+            }
+        }
+        this.remainingShipsText.setDisable(true);
+        this.remainingShipsText.setVisible(false);
+
+        if (this.boardType == 2) {
+
+            this.showEnemyIslandsButton.setDisable(true);
+            this.showEnemyIslandsButton.setVisible(false);
+
+            this.showEnemyShipsButton.setDisable(true);
+            this.showEnemyShipsButton.setVisible(false);
+        }
+        this.placedShipsText.setDisable(true);
+        this.placedShipsText.setVisible(false);
+    }
+
+    public boolean getArePlayerShipsPlaced() {
+
         return this.areShipsPlaced;
     }
-    
-    public double getMatrixSizeRow() {
+
+    public int getMatrixSizeRow() {
 
         return this.matrixSizeRow;
     }
 
-    public double getMatrixSizeColumn() {
+    public int getMatrixSizeColumn() {
 
         return this.matrixSizeColumn;
     }
@@ -758,36 +806,37 @@ public class Board {
 
         return this.firstCellPositionY;
     }
-    
-    public Cell getCell(int row, int column){
+
+    public Cell getCell(int row, int column) {
         return this.cells[row][column];
     }
-    
-    public Text getRemainingShipsText(){
+
+    public Text getRemainingShipsText() {
         return this.remainingShipsText;
     }
-    
-    public double getBoardWidth(){
+
+    public double getBoardWidth() {
         return this.boardWidth;
     }
-    
-    public double getBoardHeight(){
+
+    public double getBoardHeight() {
         return this.boardHeight;
     }
-    
-    public int getRemainingShips(){
+
+    public int getRemainingShips() {
         return this.remainingShips;
     }
-    
-    public void setRemainingShips(int pRemainingShips){
+
+    public void setRemainingShips(int pRemainingShips) {
         this.remainingShips = pRemainingShips;
     }
-    
-    public List<Ship> getShips(){
-        return this.shipsList;
-    } 
 
-    public void setShips(List<Ship> pShips){
+    public List<Ship> getShips() {
+        return this.shipsList;
+    }
+
+    public void setShips(List<Ship> pShips) {
         this.shipsList = pShips;
     }
+    
 }

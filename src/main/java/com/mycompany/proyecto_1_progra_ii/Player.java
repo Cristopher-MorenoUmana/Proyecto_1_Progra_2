@@ -8,8 +8,7 @@ public class Player {
     
     private String name;
     private Board playerBoard;
-    private Text playerBoardText;
-    
+    private Text playerBoardText;   
     
     public Player(String pName, Board pBoard){
         
@@ -32,6 +31,11 @@ public class Player {
         this.playerBoardText.setLayoutY(this.playerBoard.getFirstCellPostionY() - 10);
 
         pGameAnchorPane.getChildren().add(this.playerBoardText);
+    }
+    
+    public void disablePlayerBoardText(){
+        this.playerBoardText.setVisible(false);
+        this.playerBoardText.setDisable(true);
     }
     
     public String getPlayerName(){
