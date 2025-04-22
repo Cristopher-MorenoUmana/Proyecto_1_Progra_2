@@ -1,6 +1,5 @@
 package com.mycompany.proyecto_1_progra_ii;
 
-import javafx.scene.Cursor;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -9,6 +8,7 @@ import javafx.util.Duration;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import java.util.List;
+import javafx.scene.control.Button;
 import java.util.Random;
 
 public class Game {
@@ -28,6 +28,7 @@ public class Game {
     private int playerShootsQuantity = 0;
     private Text playerShootsText, pcShootsText, winnerText;
     private boolean isPcTurnTimerRunning = false;
+    private Button restartButton, exitButton;
     
     public Game(String pPlayerName, int pDifficulty, AnchorPane pGameAnchorPane) {
 
@@ -35,7 +36,7 @@ public class Game {
 
         Board playerBoard, pcBoard;
 
-        defineTexts();
+        defineTextsAndButtons();
 
         final double WINDOW_SPACING_X = 15, WINDOW_SPACING_Y = 60;
 
@@ -55,15 +56,29 @@ public class Game {
 
         this.pc.getBoard().placePCShips();
 
-        drawTexts(pGameAnchorPane);
+        drawComponents(pGameAnchorPane);
 
         this.pc.getBoard().placeIslands();
     
         assignShootEvent(this.pc);
     }
 
-    private void defineTexts() {
+    private void defineTextsAndButtons() {
 
+        this.restartButton = new Button("Volver a jugar");        
+        this.restartButton.setPrefWidth(100);
+        this.restartButton.setLayoutX(0);
+        this.restartButton.setLayoutY(0);
+        this.restartButton.setVisible(false);
+        this.restartButton.setDisable(true);        
+
+        this.exitButton = new Button("Salir");
+        this.exitButton.setPrefWidth(100);
+        this.exitButton.setLayoutX(0);
+        this.exitButton.setLayoutY(0);
+        this.exitButton.setVisible(false);
+        this.exitButton.setDisable(true);
+        
         this.winnerText = new Text("");
         this.winnerText.setLayoutX(0.0);
         this.winnerText.setLayoutY(0.0);
@@ -140,7 +155,7 @@ public class Game {
         this.pcShootsText.setText("Cantidad de tiros: " + this.pcShootsQuantity);
     }
 
-    private void disableTexts() {
+    private void disableTextsAndButtons() {
         
         this.playerShootsText.setDisable(true);
         this.playerShootsText.setVisible(false);
@@ -164,7 +179,7 @@ public class Game {
         this.islandText.setVisible(false);
     }
     
-    private void drawTexts(AnchorPane pGameAnchorPane) {
+    private void drawComponents(AnchorPane pGameAnchorPane) {
 
         this.pc.getBoard().getRemainingShipsText().setText("Barcos Restantes: " + this.remaingPcShips);
 
@@ -182,8 +197,27 @@ public class Game {
         pGameAnchorPane.getChildren().add(this.playerShootsText);
         pGameAnchorPane.getChildren().add(this.pcShootsText);
         pGameAnchorPane.getChildren().add(this.winnerText);
+        pGameAnchorPane.getChildren().add(this.restartButton);
+        pGameAnchorPane.getChildren().add(this.exitButton);
+
+        this.restartButton.setOnAction(e -> restartButtonPressed());
+        this.exitButton.setOnAction(e -> exitButtonPressed());
     }
 
+    private void restartButtonPressed(){
+        Main.resizeWindow(554, 500);
+        Main.restartApp();
+        this.restartButton.setDisable(true);
+        this.restartButton.setVisible(false);
+    }
+    
+    private void exitButtonPressed(){
+        
+        Main.closeApp();
+        this.exitButton.setVisible(false);
+        this.exitButton.setDisable(true);
+    }
+    
     private double pcBoardSpacing() {
 
         double spacing = 0;
@@ -480,6 +514,27 @@ public class Game {
         handleCellStateTimer(this.brokenText, cellX, cellY);
     }
        
+    private void handleButtons(){
+
+       double windowWidth = Main.getWindowWidth();
+       double windowHeight = Main.getWindowHeight();
+       
+       double xCenter = ((windowWidth - this.restartButton.getPrefWidth()) / 2 );
+       double yCenter = ((windowHeight - this.restartButton.getPrefWidth()) / 2);
+
+        this.restartButton.setLayoutX(this.player.getBoard().boardXCenterButton(this.restartButton));
+        this.restartButton.setLayoutY(this.player.getBoard().getBoardHeight() + 100);
+
+        this.exitButton.setLayoutX(this.pc.getBoard().boardXCenterButton(this.exitButton));
+        this.exitButton.setLayoutY(this.pc.getBoard().getBoardHeight() + 100);
+
+        this.restartButton.setVisible(true);
+        this.restartButton.setDisable(false);
+
+        this.exitButton.setVisible(true);
+        this.exitButton.setDisable(false);
+    }
+
     private void defineWinner(){
   
         boolean drawnGame = false;
@@ -510,13 +565,14 @@ public class Game {
         }
 
         if (this.winner != null) {
+            
             this.player.getBoard().disableBoardAndComponents();
             this.player.disablePlayerBoardText();
 
             this.pc.getBoard().disableBoardAndComponents();
             this.pc.disablePlayerBoardText();
 
-            disableTexts();
+            disableTextsAndButtons();
 
             double windowWidth = Main.getWindowWidth();
 
@@ -527,6 +583,8 @@ public class Game {
 
             this.winnerText.setVisible(true);
             this.winnerText.setDisable(false);
+            
+            handleButtons();
         }
     }
     

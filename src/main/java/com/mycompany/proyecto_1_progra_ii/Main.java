@@ -17,16 +17,30 @@ public class Main extends Application {
     public void start(Stage stage) throws IOException {
         
         Main.stage = stage;
+        
+       handleWindow();
+    }
+    
+    static void handleWindow() throws IOException {
+
         scene = new Scene(loadFXML("Menu"), 554, 500);
-        
-        scene.getStylesheets().add(getClass().getResource("/com.css/style.css").toExternalForm());
-        
+
         stage.setScene(scene);
         stage.setTitle("Batalla naval");
         stage.show();
+
     }
 
-    static void resizeWindow(double pWidth, double pHeight) throws IOException {
+    public static void restartApp() {
+        
+        try {
+            handleWindow();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+    static void resizeWindow(double pWidth, double pHeight){
 
        if (stage != null) {
             stage.setWidth(pWidth);
@@ -38,6 +52,11 @@ public class Main extends Application {
         return stage.getWidth();
     }
 
+    public static void closeApp(){
+        if(stage != null){
+            stage.close();
+        }
+    }
     static double getWindowHeight() {
         return stage.getHeight();
     }
