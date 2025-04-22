@@ -10,7 +10,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import java.util.List;
 import java.util.Random;
-import javafx.animation.Animation;
 
 public class Game {
 
@@ -20,8 +19,8 @@ public class Game {
     private int remaingPcShips = 10;
     private int remaingPlayerShips = 10;
     private Text brokenText, sunkenText, waterText, islandText, turnText;
-    private final PauseTransition cellStateTextsTimer = new PauseTransition(Duration.seconds(0.7));
-    private final PauseTransition turnTimer = new PauseTransition(Duration.seconds(2));
+    private final PauseTransition cellStateTextsTimer = new PauseTransition(Duration.seconds(0.5));
+    private final PauseTransition turnTimer = new PauseTransition(Duration.seconds(1.5));
     private double shootProbability = 0.0;
     private int failedShootsCount = 0;
     private boolean isPlayerTurn = true;
@@ -71,6 +70,7 @@ public class Game {
         this.winnerText.setFill(Color.WHITE);
         this.winnerText.setDisable(true);
         this.winnerText.setVisible(false);
+        this.winnerText.setFont(Font.font("Arial", FontWeight.BOLD, 20));
         
         this.playerShootsText = new Text("");
         this.playerShootsText.setLayoutX(0.0);
@@ -123,7 +123,25 @@ public class Game {
         this.islandText.setVisible(false);
     }
 
+    private void handleShootsQuantity() {
+        
+        this.playerShootsText.setLayoutX(this.player.getBoard().boardXCenterText(this.playerShootsText));
+        this.playerShootsText.setLayoutY(this.player.getBoard().getBoardHeight() + 100);
+        this.playerShootsText.setVisible(true);
+        this.playerShootsText.setDisable(false);
+        
+        this.pcShootsText.setLayoutX(this.pc.getBoard().boardXCenterText(this.pcShootsText));
+        this.pcShootsText.setLayoutY(this.pc.getBoard().getBoardHeight() + 100);
+        this.pcShootsText.setVisible(true);
+        this.pcShootsText.setDisable(false);
+        
+        this.playerShootsText.setText("Cantidad de tiros: " + this.playerShootsQuantity);
+        
+        this.pcShootsText.setText("Cantidad de tiros: " + this.pcShootsQuantity);
+    }
+
     private void disableTexts() {
+        
         this.playerShootsText.setDisable(true);
         this.playerShootsText.setVisible(false);
         
@@ -239,7 +257,7 @@ public class Game {
 
         this.pc.getBoard().getCell(row, column).getCellBox().setOnMouseClicked(e -> {
 
-            if (this.winner != null) {
+            if (this.remaingPcShips == 0) {
                 defineWinner();
                 return;
             }
@@ -250,51 +268,7 @@ public class Game {
 
             if (this.isPlayerTurn) {
           
-                double cellX = this.pc.getBoard().getCell(row, column).getCellBox().getX();
-                double cellY = this.pc.getBoard().getCell(row, column).getCellBox().getY() + 15;
-
-                boolean isWater = (this.pc.getBoard().getCell(row, column).getCellState() == 0);
-                boolean isAShip = (this.pc.getBoard().getCell(row, column).getCellState() == 2);
-                boolean isAnIsland = (this.pc.getBoard().getCell(row, column).getCellState() == 3);
-
-                if (isWater) {
-
-                    handleCellStateTimer(this.waterText, cellX, cellY);
-
-                    this.pc.getBoard().getCell(row, column).setCellState(1);
-                    this.pc.getBoard().getCell(row, column).setCellColor("#66FFFF");
-
-                    blockCell(this.pc, row, column);
-
-                }
-                if (isAShip) {
-
-                    this.pc.getBoard().getCell(row, column).setCellState(4);
-                    this.pc.getBoard().getCell(row, column).setCellColor("#FF0000");
-
-                    if (isShipDestroyed(this.pc, row, column)) {
-
-                        this.remaingPcShips--;
-                        this.pc.getBoard().getRemainingShipsText().setText("Barcos Restantes: " + this.remaingPcShips);
-                        handleCellStateTimer(this.sunkenText, cellX, cellY);
-                    } else {
-                        handleCellStateTimer(this.brokenText, cellX, cellY);
-
-                    }
-
-                } 
-                if (isAnIsland) {
-
-                    this.pc.getBoard().getCell(row, column).setCellState(1);
-                    this.pc.getBoard().getCell(row, column).setCellColor("#CC9600");
-
-                    shootAtPlayer();
-
-                    handleCellStateTimer(this.islandText, cellX, cellY);
-                    blockCell(this.pc, row, column);
-                }
-                this.isPlayerTurn = false;
-                this.pc.getBoard().blockClicks(true);
+              shootAtPc(row, column);
             }  
             
             if(!this.isPlayerTurn && !this.isPcTurnTimerRunning) {
@@ -313,35 +287,70 @@ public class Game {
                 this.turnTimer.playFromStart();
                 this.pc.getBoard().blockClicks(false);
             }
-            
-            if(this.remaingPcShips == 0){
-                defineWinner();
-            }
+      
         });
-
-        this.pc.getBoard().getCell(row, column).getCellBox().setOnMouseEntered(e -> {
-            if (this.player.getBoard().getArePlayerShipsPlaced() && !this.isPcTurnTimerRunning 
-                    || this.winner != null) {
-                this.pc.getBoard().getCell(row, column).getCellBox().setCursor(Cursor.CROSSHAIR);
-            }
-
-        });
-
-        this.pc.getBoard().getCell(row, column).getCellBox().setOnMouseExited(e
-                -> this.pc.getBoard().getCell(row, column).getCellBox().setCursor(Cursor.DEFAULT)
-        );
-
-        this.playerShootsQuantity++;
     }
 
-    private void pcShoot() {
+    private void shootAtPc(int row, int column) {
 
+        double cellX = this.pc.getBoard().getCell(row, column).getCellBox().getX();
+        double cellY = this.pc.getBoard().getCell(row, column).getCellBox().getY() + 15;
+
+        boolean isWater = (this.pc.getBoard().getCell(row, column).getCellState() == 0);
+        boolean isAShip = (this.pc.getBoard().getCell(row, column).getCellState() == 2);
+        boolean isAnIsland = (this.pc.getBoard().getCell(row, column).getCellState() == 3);
+
+        if (isWater) {
+
+            handleCellStateTimer(this.waterText, cellX, cellY);
+
+            this.pc.getBoard().getCell(row, column).setCellState(1);
+            this.pc.getBoard().getCell(row, column).setCellColor("#66FFFF");
+
+            blockCell(this.pc, row, column);
+
+        }
+        if (isAShip) {
+
+            this.pc.getBoard().getCell(row, column).setCellState(4);
+            this.pc.getBoard().getCell(row, column).setCellColor("#FF0000");
+
+            if (isShipDestroyed(this.pc, row, column)) {
+
+                this.remaingPcShips--;
+                this.pc.getBoard().getRemainingShipsText().setText("Barcos Restantes: " + this.remaingPcShips);
+                handleCellStateTimer(this.sunkenText, cellX, cellY);
+            } else {
+                handleCellStateTimer(this.brokenText, cellX, cellY);
+
+            }
+
+        }
+        if (isAnIsland) {
+
+            this.pc.getBoard().getCell(row, column).setCellState(1);
+            this.pc.getBoard().getCell(row, column).setCellColor("#CC9600");
+
+            shootAtPlayer();
+
+            handleCellStateTimer(this.islandText, cellX, cellY);
+            blockCell(this.pc, row, column);
+        }
+        this.isPlayerTurn = false;
+        this.pc.getBoard().blockClicks(true);
+
+        this.playerShootsQuantity++;
+        handleShootsQuantity();
+    }
+    
+    private void pcShoot() {
+ 
         this.isPlayerTurn = true;
         
         double probabilityIncrease = 0;
 
         if (this.difficulty == 1) {
-            this.shootProbability = 0.2;
+            this.shootProbability = 0.3;
             probabilityIncrease = 0.20;
         }
         if (this.difficulty == 2) {
@@ -372,11 +381,15 @@ public class Game {
                 shootAtPlayer();
                 this.failedShootsCount = 0;
             }
-
-        }
+        }     
         this.pcShootsQuantity++;
+        handleShootsQuantity();
+
+        if(this.remaingPcShips == 0 && this.pcShootsQuantity == this.playerShootsQuantity){
+            defineWinner();
+        }
         
-        if(this.remaingPlayerShips == 0) {
+        if(this.remaingPlayerShips == 0){
             defineWinner();
         }
     }
@@ -453,9 +466,9 @@ public class Game {
 
         double cellX = this.player.getBoard().getCell(shipPosition[0], shipPosition[1]).getCellBox().getX();
         double cellY = this.player.getBoard().getCell(shipPosition[0], shipPosition[1]).getCellBox().getY() + 15;
-
+        
         if (isShipDestroyed(this.player, shipPosition[0], shipPosition[1])) {
-
+            
             this.remaingPlayerShips--;
 
             this.player.getBoard().getRemainingShipsText().setText("Barcos Restantes: " + this.remaingPlayerShips);
@@ -466,24 +479,55 @@ public class Game {
 
         handleCellStateTimer(this.brokenText, cellX, cellY);
     }
-    
+       
     private void defineWinner(){
-        
-        if (this.remaingPcShips == 0) {
-            this.winner = this.player.getPlayerName();
+  
+        boolean drawnGame = false;
+
+        //this.remaingPlayerShips = 0; //comprobar si funciona el empate
+
+        drawnGame = ((this.remaingPcShips == 0 && this.remaingPlayerShips == 0)
+                && this.pcShootsQuantity == this.playerShootsQuantity);
+
+        if (drawnGame) {
+
+            this.winner = "Juego empatado";
+            this.winnerText.setText(this.winner);
+            this.winner = "Juego empatado";
+            this.winnerText.setText(this.winner);
+            
+        } else if (this.remaingPcShips == 0) {
+
+            if (!drawnGame) {
+                this.winner = this.player.getPlayerName();
+                this.winnerText.setText("El jugador: " + this.winner + " gana la partida");
+            }
+
         } else if (this.remaingPlayerShips == 0) {
+
             this.winner = this.pc.getPlayerName();
+            this.winnerText.setText("El jugador: " + this.winner + " gana la partida");
         }
-        
-        this.player.getBoard().disableBoardAndComponents();
-        this.player.disablePlayerBoardText();
-        
-        this.pc.getBoard().disableBoardAndComponents();
-        this.pc.disablePlayerBoardText();
-        
-        disableTexts();
-        
-        return;
+
+        if (this.winner != null) {
+            this.player.getBoard().disableBoardAndComponents();
+            this.player.disablePlayerBoardText();
+
+            this.pc.getBoard().disableBoardAndComponents();
+            this.pc.disablePlayerBoardText();
+
+            disableTexts();
+
+            double windowWidth = Main.getWindowWidth();
+
+            double xCenter = (windowWidth - this.winnerText.getBoundsInLocal().getWidth()) / 2;
+
+            this.winnerText.setLayoutX(xCenter);
+            this.winnerText.setLayoutY(30);
+
+            this.winnerText.setVisible(true);
+            this.winnerText.setDisable(false);
+        }
     }
     
     private boolean isShipDestroyed(Player pPlayer, int row, int column) {

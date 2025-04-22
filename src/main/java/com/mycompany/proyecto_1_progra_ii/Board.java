@@ -667,7 +667,7 @@ public class Board {
         boolean isOutOfRange = (this.isShipHorizontal && (column + shipSize > this.matrixSizeColumn))
                 || (this.isShipVertical && (row + shipSize > this.matrixSizeRow));
 
-        if (isOutOfRange) {
+        if (isOutOfRange) { 
             this.cells[row][column].setCellColor(RED);
 
             this.cells[row][column].getCellBox().setOnMouseExited(e -> {
@@ -754,7 +754,6 @@ public class Board {
             for (int j = 0; j < this.matrixSizeColumn; j++) {
 
                 this.cells[i][j].getCellBox().setDisable(true);
-                this.cells[i][j].getCellBox().setVisible(false);
             }
         }
         this.remainingShipsText.setDisable(true);
